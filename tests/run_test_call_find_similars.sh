@@ -1,0 +1,1 @@
+python test_call_find_similars.py -m "./test_dat/model.dat" -d "./test_dat/dataset.dat" -i "./test_img/subject04.gif" -o "./test_dat/test_output.txt" -r local

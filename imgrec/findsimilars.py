@@ -1,51 +1,57 @@
 ﻿from mrjob.job import MRJob
 from mrjob.job import MRStep
-from sklearn.externals import joblib
-import csv, StringIO, heapq
+import csv, StringIO, heapq, helpers, numpy as np
 
 FACE_OPTION = '--new_eigenface'
 MAX_RESULTS_OPTION = '--max_results'
 
 class FindSimilars():
-    def get_unique_filename(prefix):
-        return prefix + 'something_unique'
+    @classmethod
+    def __get_eigenface_file_from_image(cls, model_file, image_file, size):
+        model = helpers.load(model_file)
+        im = helpers.get_nparray_from_img(image_file, size)
+        eigenface = model.transform([im])
+        eigenface_file = helpers.get_temp_filename()
+        helpers.dump(eigenface, eigenface_file, compress_level=3)
+        return eigenface_file
 
     @classmethod
-    def find_similars(cls, model_file, face_file, dataset, size, n=10, job_options):
+    def find(cls, model_file, image_file, dataset, size=None, max_results=10, job_options=['r', 'inline']):
         """
         """
+        face_file = cls.__get_eigenface_file_from_image(model_file, image_file, size)
+
         # Build options for running the map reduce job
-        opt = [FACE_OPTION, new_face_file,
-               MAX_RESULTS_OPTION, model_file]
+        opt = [FACE_OPTION, face_file,
+               MAX_RESULTS_OPTION, str(max_results)]
 
         # Add custom user options
-        [opt.append(o) for o in job_options]
+        [opt.append(str(o)) for o in job_options]
         
-        # Leave the dataset for last
+        # Leave the input dataset for last
         opt.append(dataset)
 
         # Call and run the job and output the key, value pairs
         job = FindSimilarsMapReduce(opt)
-        with mrjob.make_runner() as runner:
+        with job.make_runner() as runner:
             runner.run()
             for line in runner.stream_output():
-                key, value = mrjob.parse_output_line(line)
+                key, value = job.parse_output_line(line)
                 yield key, value
 
 class FindSimilarsMapReduce(MRJob):
-        """       
-        """
+    """       
+    """
+
     def configure_options(self):
-        super(FindSimilars,self).configure_options()
+        super(FindSimilarsMapReduce, self).configure_options()
         self.add_file_option(FACE_OPTION)
         self.add_passthrough_option(MAX_RESULTS_OPTION, type='int', default=10)
 
     def load_options(self, args):
-        super(FindSimilars, self).load_options(args)
-        self.new_eigenface = self.load_file(self.options.new_eigenface)
-
-    def load_file(self, filename):
-        return joblib.load(filename)
+        super(FindSimilarsMapReduce, self).load_options(args)
+        self.new_eigenface = helpers.load(getattr(self.options, FACE_OPTION[2:]))
+        self.max_resutls = getattr(self.options, MAX_RESULTS_OPTION[2:])
 
     def normalize(self, value):
         """
@@ -63,14 +69,32 @@ class FindSimilarsMapReduce(MRJob):
         return np.linalg.norm(a-b)
 
     def mapper(self, _, line):
+        """
+        Reads a CSV entry with id, description and eigenface representation vector and
+        computes the **eigenface** similary to the **new_eigenface** in a [0,1] interval
+        where 0 is completely dissimilar and 1 is identical.
+        The results are not ratio data, ie. 0.6 is not twice as similar than 0.3, the ratio can not
+        be determined.
+        """
         for id, desc, eigenface_str in csv.reader(StringIO.StringIO(line)):
             user_eigenface = np.asarray(map(float, eigenface_str.split()))
-            yield None, (id, desc, self.normalize(self.distance(user_eigenface, self.new_eigenface)))
+            yield None, (id, desc, self.distance(user_eigenface, self.new_eigenface))
+
+    def combiner(self, _, user_distances):
+        """
+        Trims the results to only the top **max_results** similar faces
+        """
+        most_similars = heapq.nsmallest(self.max_resutls, user_distances, key=lambda x: x[2])
+        for id, desc, similarity in most_similars:
+            yield None, (id, desc, similarity)
 
     def reducer(self, _, user_distances):
-        most_similars = heapq.nlargest(10, user_distances, key=lambda x: x[2])
+        """
+        Returns the **max_results** most similar faces
+        """
+        most_similars = heapq.nsmallest(self.max_resutls, user_distances, key=lambda x: x[2])
         for id, desc, similarity in most_similars:
-            yield id, (similarity, desc)
+            yield id, (desc, similarity)
 
 if __name__ == '__main__':
     FindSimilarsMapReduce.run()
