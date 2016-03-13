@@ -40,12 +40,19 @@ def main(argv):
             usage()
             sys.exit(2)
 
-    for k, v in FindSimilars.find(model_file=path.abspath(inpca),
-        image_file=path.abspath(inimg),
-        dataset=path.abspath(indataset),
-        size=(w,h),
-        job_options=['-r', runner]):
-        print '(k,v) = ({},{})'.format(k, v)
+    with open(outfile, 'w') as f:
+        for k, v in FindSimilars.find(model_file=path.abspath(inpca),
+            image_file=path.abspath(inimg),
+            dataset=path.abspath(indataset),
+            size=(w,h),
+            job_options=['-r', runner]):
+            line = '(k,v) = ({},{})'.format(k, v) 
+            f.write(line)
+            print line
+
+    print ''
+    print 'Results written to {}'.format(outfile)
+    print ''
 
 if __name__ == "__main__":
    main(sys.argv[1:])
