@@ -4,7 +4,7 @@ from django.contrib import admin
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^face_matcher/', include('face_matcher.urls')),
+    url(r'', include('face_matcher.urls')),
 )
 
 if settings.DEBUG:

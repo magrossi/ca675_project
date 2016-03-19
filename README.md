@@ -4,6 +4,7 @@ TODO - description
 
 ### Bootstrapping
 
+1. Install the latest docker toolkit, `open https://github.com/docker/toolbox/releases/tag/v1.10.3`
 1. Create a machine, `docker-machine create -d virtualbox --virtualbox-memory 4096 --virtualbox-cpu-count "2" dev`
 1. Start and point to the instance, `docker-machine start dev && eval $(docker-machine env dev)`
 1. Build the images and start the services, `docker-compose build && docker-compose up -d && docker-compose logs`
@@ -15,7 +16,7 @@ TODO - description
 ### Running migrations
 
 1. Upon making model DDL changes (from www), `docker-compose run www /usr/local/bin/python manage.py makemigrations face_matcher`
-2. Then run the new migration (from www), `docker-compose run www /usr/local/bin/python manage.py migrate`
+1. Then run the new migration (from www), `docker-compose run www /usr/local/bin/python manage.py migrate`
 
 ## Running the REPL
 

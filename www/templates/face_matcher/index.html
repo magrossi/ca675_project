@@ -3,19 +3,28 @@
 {% load staticfiles %}
 
 <html>
-
     <head>
         <title>Face Matcher</title>
-        <link rel="stylesheet" href="{% static "css/base.css" %}" /> <!-- CSS -->
-        <script src="{% static "js/jquery.js" %}"></script> <!-- JavaScript -->
     </head>
 
     <body>
-        <h1>Selfie Dog says...</h1>
-        hello world! <strong>{{ boldmessage }}</strong><br />
-        <a href="/face_matcher/about/">About</a><br />
+        <h1>Face Matcher Uploads...</h1>
+        <a href="/about/">About</a>
 
-        <img src="{% static "images/dog.png" %}" alt="Picture of Dog" />
+        {% if uploads %}
+            <ul>
+                {% for upload in uploads %}
+                <li>{{ upload.user.username }} | {{ upload.user.first_name }} | {{ upload.user.last_name }}
+                  <div>
+                    <img src="{{ upload.url }}" />
+                  </div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <strong>There are no uploads present.</strong>
+        {% endif %}
+
+
     </body>
-
 </html>
