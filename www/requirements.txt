@@ -1,0 +1,11 @@
+Django==1.7
+Pillow==3.1.1
+django-seed==0.1.6
+fake-factory==0.5.7
+ipaddress==1.0.16
+pep8==1.7.0
+python-dateutil==2.5.1
+six==1.10.0
+wsgiref==0.1.2
+gunicorn==19.3.0
+psycopg2==2.6

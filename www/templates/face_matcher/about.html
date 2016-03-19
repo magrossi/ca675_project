@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+
+<html>
+    <head>
+        <title>Face Matcher</title>
+    </head>
+
+    <body>
+        <h1>Selfie Dog says...</h1>
+        <a href="/">Home</a>
+
+        <br />
+        Welcome to the about page <strong>{{ boldmessage }}</strong><br />
+
+        <img src="{% static "images/dog.png" %}" alt="Picture of Dog" />
+    </body>
+</html>

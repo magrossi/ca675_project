@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+
+<html>
+    <head>
+        <title>Face Matcher</title>
+    </head>
+
+    <body>
+        <h1>Face Matcher Uploads...</h1>
+        <a href="/about/">About</a>
+
+        {% if uploads %}
+            <ul>
+                {% for upload in uploads %}
+                <li>{{ upload.user.username }} | {{ upload.user.first_name }} | {{ upload.user.last_name }}
+                  <div>
+                    <img src="{{ upload.url }}" />
+                  </div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <strong>There are no uploads present.</strong>
+        {% endif %}
+
+
+    </body>
+</html>
