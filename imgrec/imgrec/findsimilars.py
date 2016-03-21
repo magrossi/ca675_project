@@ -80,19 +80,19 @@ class FindSimilarsMapReduce(MRJob):
             user_eigenface = np.asarray(map(float, eigenface_str.split()))
             yield None, (id, desc, self.distance(user_eigenface, self.new_eigenface))
 
-    def combiner(self, _, user_distances):
+    def combiner(self, _, user_similarities):
         """
         Trims the results to only the top **max_results** similar faces
         """
-        most_similars = heapq.nsmallest(self.max_resutls, user_distances, key=lambda x: x[2])
+        most_similars = heapq.nlargest(self.max_resutls, user_similarities, key=lambda x: x[2])
         for id, desc, similarity in most_similars:
             yield None, (id, desc, similarity)
 
-    def reducer(self, _, user_distances):
+    def reducer(self, _, user_similarities):
         """
         Returns the **max_results** most similar faces
         """
-        most_similars = heapq.nsmallest(self.max_resutls, user_distances, key=lambda x: x[2])
+        most_similars = heapq.nlargest(self.max_resutls, user_similarities, key=lambda x: x[2])
         for id, desc, similarity in most_similars:
             yield id, (desc, similarity)
 
