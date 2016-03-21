@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 import os
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 SECRET_KEY = os.environ['SECRET_KEY']
@@ -20,7 +19,6 @@ DEBUG = True
 TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -78,3 +76,6 @@ STATIC_URL = '/static/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+FACEREC_SIZE = (int(os.environ['FACEREC_WIDTH']), int(os.environ['FACEREC_HEIGHT']))
+FACEREC_COMPONENTS = int(os.environ['FACEREC_COMPONENTS'])

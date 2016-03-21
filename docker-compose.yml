@@ -5,10 +5,7 @@ www:
     - "8000"
   links:
     - postgres:postgres
-  volumes:
-    - ./www:/usr/src/app
   env_file: .env
-  command: /usr/local/bin/gunicorn web.wsgi:application -w 2 -b :8000 --reload
 
 nginx:
   restart: always
