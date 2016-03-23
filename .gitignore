@@ -84,3 +84,5 @@ ENV/
 # other
 db.sqlite3
 .DS_Store
+*.bmp
+*.failed

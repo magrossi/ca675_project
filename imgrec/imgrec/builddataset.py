@@ -44,7 +44,7 @@ def main(argv):
         data.append(helpers.get_nparray_from_img(file, (w, h)))
         data_labels.append(basename(file)) # temporary while we do not have more info
 
-    model = helpers.get_model(n_components=nc, data=data)    
+    model = helpers.get_model(n_components=nc, data=data)
     helpers.dump(model, join(outdir, MODEL_FILE), compress_level=3)
 
     with open(join(outdir, DATASET_FILE), 'wb') as f:
