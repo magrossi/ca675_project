@@ -1,4 +1,4 @@
-## CA675 Group Project
+# CA675 Group Project ![Build status](https://circleci.com/gh/magrossi/ca675_project.svg?style=shield)
 
 TODO - description
 
@@ -13,12 +13,17 @@ TODO - description
 1. Seed the database (from www), `docker-compose run www /usr/local/bin/python seed.py`
 1. Grab the IP, `docker-machine ip dev`, and view in your browser
 
+### Running Tests Locally
+
+1. Build the images, `docker-compose build`
+2. Run the tests, `docker-compose run www /usr/local/bin/python manage.py test`
+
 ### Running migrations
 
 1. Upon making model DDL changes (from www), `docker-compose run www /usr/local/bin/python manage.py makemigrations face_matcher`
 1. Then run the new migration (from www), `docker-compose run www /usr/local/bin/python manage.py migrate`
 
-## Running the REPL
+### Running the REPL
 
 Simply run (from www) `docker-compose run www /usr/local/bin/python manage.py shell`
 ```
@@ -31,7 +36,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 []
 ```
 
-## Running the Psql shell
+### Running the Psql shell
 
 Simply run (from www) `docker-compose run www /usr/local/bin/python manage.py dbshell`
 ```

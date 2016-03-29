@@ -1,0 +1,32 @@
+
+machine:
+  pre:
+    - sudo curl -L -o /usr/bin/docker 'https://s3-external-1.amazonaws.com/circle-downloads/docker-1.9.1-circleci'
+    - sudo chmod 0755 /usr/bin/docker
+  python:
+    version: 2.7.6
+  services:
+    - docker
+
+dependencies:
+  override:
+    - pip install -U boto3 awscli shyaml
+    - eval `aws ecr get-login --region us-east-1`
+    - BRANCH=${CIRCLE_BRANCH/\//_} python circleci/pull_image.py
+    - perl circleci/docker_file_timestamp.pl
+    - cd www && docker build -t $DOCKER_ECR_URL/$DOCKER_REPO:${CIRCLE_BRANCH/\//_} .
+    - docker run -d --name db $(cat docker-compose.yml | shyaml get-value postgres.image)
+
+test:
+  override:
+    - docker run --rm --link db:postgres --env-file .env $DOCKER_ECR_URL/$DOCKER_REPO:${CIRCLE_BRANCH/\//_} python manage.py test
+
+deployment:
+  release:
+    branch:
+      - develop
+      - /feature\/.*/
+      - /hotfix\/.*/
+      - master
+    commands:
+      - docker push $DOCKER_ECR_URL/$DOCKER_REPO:${CIRCLE_BRANCH/\//_}
