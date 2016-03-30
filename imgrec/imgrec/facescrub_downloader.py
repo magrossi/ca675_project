@@ -37,7 +37,8 @@ def proc_item(item):
             raise Exception('sha256 mismatch')
         # Process image
         img = Image.open(StringIO(img_raw)).crop(bbox)
-        img = helpers.pre_process_image(img, size=(100,100))
+        # Removed image preprocessing in favor for doing it at a later stage
+        # img = helpers.pre_process_image(img, size=(100,100))
         img.save(local_img)
     except Exception as e:
         with open(failed_img_file, 'a') as err:
@@ -82,17 +83,17 @@ def main(argv):
             sys.exit(2)
 
     start = time.time()
-    # 'id', 'name', 'url', 'bbox', 'sha256', 'img_processed'
+    # 'id', 'name', 'gender', 'url', 'bbox', 'sha256', 'img_processed'
     with open(dataset_file, 'rb') as dset:
         reader = csv.reader(dset, dialect='excel')
         next(reader, None)  # skip the headers
         # Downloads files in parallel up to 'jobs' concurrently
         Parallel(n_jobs=jobs)(delayed(proc_item)((retry, url, map(lambda s: int(s), bbox.split(',')), sha256, abspath(join(img_path, local_img))))
-            for id, name, url, bbox, sha256, local_img in reader)
+            for id, name, gender, url, bbox, sha256, local_img in reader)
 
         # Sequential mode for debug
         #count = len([proc_item((url, map(lambda s: int(s), bbox.split(',')), sha256, abspath(join(img_path, local_img))))
-        #    for id, name, url, bbox, sha256, local_img in reader])
+        #    for id, name, gender, url, bbox, sha256, local_img in reader])
     end = time.time()
 
     print ''
