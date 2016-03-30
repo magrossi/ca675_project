@@ -41,8 +41,8 @@ RUN pip install --no-cache-dir virtualenv
 
 
 ### Fetch datasets from Google Drive
-ENV SEED_IMAGES_ZIP_DRIVE_ID 0B7SUokFDtdvPY2dBMkREaDdkWkE
-ENV FACESCRUB_DATASET_ZIP_DRIVE_ID 0B7SUokFDtdvPUWFhcWc5S2o3RHc
+ENV SEED_IMAGES_ZIP_DRIVE_ID 0B9sGPengIdV0eUFVMlJPejRRblk
+ENV FACESCRUB_DATASET_ZIP_DRIVE_ID 0B9sGPengIdV0R2ZBSjM3bEp1YTQ
 RUN wget --no-check-certificate https://googledrive.com/host/$SEED_IMAGES_ZIP_DRIVE_ID -O seed_images.zip
 RUN wget --no-check-certificate https://googledrive.com/host/$FACESCRUB_DATASET_ZIP_DRIVE_ID -O facescrub_dataset.zip
 
