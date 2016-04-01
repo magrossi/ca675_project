@@ -22,7 +22,7 @@ nginx:
 
 postgres:
   restart: always
-  image: postgres:latest
+  image: postgres:9.5
   volumes_from:
     - data
   ports:
@@ -30,7 +30,7 @@ postgres:
 
 data:
   restart: always
-  image: postgres:latest
+  image: postgres:9.5
   volumes:
     - /var/lib/postgresql
   command: "true"
