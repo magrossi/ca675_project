@@ -1,4 +1,5 @@
 from django.contrib import admin
-from face_matcher.models import Upload
+from face_matcher.models import Face, Actor
 
-admin.site.register(Upload)
+admin.site.register(Face)
+admin.site.register(Actor)
