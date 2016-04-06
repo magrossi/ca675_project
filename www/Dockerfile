@@ -44,7 +44,8 @@ ENV FACEREC_WIDTH 100
 ENV FACEREC_HEIGHT 100
 ENV FACEREC_COMPONENTS 150
 ENV WORKDIR /usr/src/app
-ENV IMG_BASE_DIR /usr/src/app/static/images
+ENV IMG_BASE_DIR $WORKDIR/static/images
+
 RUN mkdir -p $WORKDIR
 WORKDIR $WORKDIR
 VOLUME $WORKDIR
@@ -54,19 +55,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . $WORKDIR
 
 ### Fetch datasets from Google Drive
-#ENV FACESCRUB_DATASET_ZIP_DRIVE_ID 0Bzt4aP7vYnOTaENxWVFCQ0kwRkU
-#RUN wget --no-check-certificate https://googledrive.com/host/$FACESCRUB_DATASET_ZIP_DRIVE_ID -O /tmp/facescrub_dataset.tar.gz #&& \
-#    tar xvf /tmp/facescrub_dataset.tar.gz -C $WORKDIR && \
-#    rm /tmp/facescrub_dataset.tar.gz
-#ADD https://googledrive.com/host/$FACESCRUB_DATASET_ZIP_DRIVE_ID $WORKDIR
-#RUN tar xzf $FACESCRUB_DATASET_ZIP_DRIVE_ID -C $WORKDIR
-#COPY /tmp/facescrub_dataset.tar.gz $WORKDIR
-
+ENV FACESCRUB_DRIVE_ID 0Bzt4aP7vYnOTYXpodUFmMlY4WVU
+ADD https://googledrive.com/host/$FACESCRUB_DRIVE_ID/facescrub_dataset.tar.gz $WORKDIR/
 ### This is a debug/dev dataset, it can be removed once the IMG_BASE_DIR is in S3
-#ENV SEED_IMAGES_ZIP_DRIVE_ID 0Bzt4aP7vYnOTamRXQWpPT25WSVk
-#RUN wget --no-check-certificate https://googledrive.com/host/$SEED_IMAGES_ZIP_DRIVE_ID -O /tmp/seed_images.zip && \
-#    tar xvf /tmp/seed_images.zip -C $IMG_BASE_DIR && \
-#    rm /tmp/seed_images.zip
-# ADD https://googledrive.com/host/$SEED_IMAGES_ZIP_DRIVE_ID $IMG_BASE_DIR/seed_images.tar.gz
+ADD https://googledrive.com/host/$FACESCRUB_DRIVE_ID/seed_images.tar.gz $IMG_BASE_DIR/
 
 CMD /usr/local/bin/gunicorn web.wsgi:application -w 2 -b :8000 --reload
