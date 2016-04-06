@@ -77,5 +77,6 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-FACEREC_SIZE = (int(os.environ['FACEREC_WIDTH']), int(os.environ['FACEREC_HEIGHT']))
+FACEREC_IMG_SIZE = (int(os.environ['FACEREC_WIDTH']), int(os.environ['FACEREC_HEIGHT']))
 FACEREC_COMPONENTS = int(os.environ['FACEREC_COMPONENTS'])
+IMG_BASE_DIR = os.environ['IMG_BASE_DIR']

@@ -11,18 +11,18 @@
         <h1>Face Matcher Uploads...</h1>
         <a href="/about/">About</a>
 
-        {% if uploads %}
+        {% if faces %}
             <ul>
-                {% for upload in uploads %}
-                <li>{{ upload.user.username }} | {{ upload.user.first_name }} | {{ upload.user.last_name }}
+                {% for face in faces %}
+                <li>{{ face.actor.name }} | {{ face.actor.gender }}
                   <div>
-                    <img src="{{ upload.url }}" />
+                    <img src="{{ face.url }}" />
                   </div>
                 </li>
                 {% endfor %}
             </ul>
         {% else %}
-            <strong>There are no uploads present.</strong>
+            <strong>There are no faces present.</strong>
         {% endif %}
 
 

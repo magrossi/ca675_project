@@ -11,6 +11,7 @@ TODO - description
 1. Create migrations (from www), `docker-compose run www /usr/local/bin/python manage.py migrate`
 1. Add an admin user (from www), `docker-compose run www /usr/local/bin/python manage.py createsuperuser --username root --email root@root.com`
 1. Seed the database (from www), `docker-compose run www /usr/local/bin/python seed.py`
+1. Create the working model/face dataset files (from wwww), `docker-compose run www /usr/local/bin/python build_datasets.py`
 1. Grab the IP, `docker-machine ip dev`, and view in your browser
 
 ### Running Tests Locally
@@ -71,4 +72,43 @@ postgres=# \d
  public | face_matcher_upload               | table    | postgres
  public | face_matcher_upload_id_seq        | sequence | postgres
 (21 rows)
+```
+
+### Example for searching similar faces
+
+The below is a sample Python script that will use the app to search for similar faces (when the UI is done we can use the same code to submit our searches).
+
+This script takes advantage of the `demo` user that is created in the seed.py script and will return the 10 most similar faces alongside their similarity score (value in the `[0,1]` interval). The higher the score, the more similar the faces are.
+
+The `FindSimilars.find()` function accepts some parameters besides just the `history` object:
+
+```
+find(history, similarity_method='cosine', face_source_filter='all', max_results=10, job_options=['r', 'inline'])
+```
+
+* `similarity_method=` defines which similarity function will be used. Possible functions are `cosine` and `euclidean`. The returned faces may vary depending on the function used.
+* `face_source_filter=` will filter the search depending on the source of the face image, `actor` will only look for images of actors, `user` only for user images and `all` will look for similarity between all images.
+* `max_results=` defines the number of similar faces returned
+* `job_options=` will simply forward the parameters to the `MrJob` map reduce framework. This allows us to change where the job will be run. If we want to run this in EMR for example we can pass `['r', 'emr']` as parameters. The default is `['r', 'inline']` which is ideal for running the job locally. Please refer to https://pythonhosted.org/mrjob/ for specific options available.
+
+```
+import os, django
+from django.conf import settings
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'web.settings')
+django.setup()
+
+from face_matcher.models import Face, Actor, History, HistoryItem
+from django.contrib.auth.models import User
+from findsimilars import FindSimilars
+
+user = User.objects.get(username='demo')
+face = user.face_set.first()
+
+history = History.objects.create(user=user, in_face=face)
+history.save()
+FindSimilars.find(history)
+print 'Similarity results: {} [{}]'.format(history.status, history.output)
+for item in history.historyitem_set.all():
+  print '{}, {}'.format(item.face.id, item.similarity_score)
 ```

@@ -1,10 +1,10 @@
 from django.shortcuts import render
-from face_matcher.models import Upload
+from face_matcher.models import Face, Actor
 
 
 def index(request):
-    uploads = Upload.objects.all()[:10]
-    context_dict = {'uploads': uploads}
+    faces = Face.objects.all()[:10]
+    context_dict = {'faces': faces}
     return render(request, 'face_matcher/index.html', context_dict)
 
 
