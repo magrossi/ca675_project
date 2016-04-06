@@ -11,6 +11,7 @@ TODO - description
 1. Create migrations (from www), `docker-compose run www /usr/local/bin/python manage.py migrate`
 1. Add an admin user (from www), `docker-compose run www /usr/local/bin/python manage.py createsuperuser --username root --email root@root.com`
 1. Seed the database (from www), `docker-compose run www /usr/local/bin/python seed.py`
+1. Create the working model/face dataset files (from wwww), `docker-compose run www /usr/local/bin/python build_datasets.py`
 1. Grab the IP, `docker-machine ip dev`, and view in your browser
 
 ### Running Tests Locally
