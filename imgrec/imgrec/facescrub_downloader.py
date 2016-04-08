@@ -1,4 +1,4 @@
-import sys, getopt, csv, time, hashlib, urllib2, helpers
+import sys, getopt, csv, time, hashlib, urllib2
 from StringIO import StringIO
 from joblib import Parallel, delayed
 from os import makedirs, remove
@@ -37,8 +37,6 @@ def proc_item(item):
             raise Exception('sha256 mismatch')
         # Process image
         img = Image.open(StringIO(img_raw)).crop(bbox)
-        # Removed image preprocessing in favor for doing it at a later stage
-        # img = helpers.pre_process_image(img, size=(100,100))
         img.save(local_img)
     except Exception as e:
         with open(failed_img_file, 'a') as err:
@@ -97,7 +95,7 @@ def main(argv):
     end = time.time()
 
     print ''
-    print 'Downloaded {} images in {} seconds.'.format(count, end-start)
+    print 'Finished downloading images in {} seconds.'.format(end-start)
     print ''
 
 if __name__ == "__main__":

@@ -3,7 +3,8 @@ from mrjob.job import MRStep
 from scipy import spatial
 from face_matcher.models import Face, History
 from django.utils import timezone
-import csv, StringIO, heapq, helpers, numpy as np
+from helpers import ImageLibrary, ModelBuilder
+import os, csv, StringIO, heapq, tempfile, numpy as np
 
 FACE_OPTION = '--new_eigenface'
 MAX_RESULTS_OPTION = '--max_results'
@@ -14,22 +15,19 @@ SIMILARITY_METHOD_OPTS = ['cosine', 'euclidean']
 
 class FindSimilars():
     @classmethod
-    def __get_eigenface_file_from_image(cls, image_file, bbox):
-        model = helpers.load_model()
-        im = helpers.get_nparray_from_img(image_file, bbox)
-        eigenface = model.transform([im])
-        eigenface_file = helpers.get_temp_filename()
-        helpers.dump(eigenface, eigenface_file, compress_level=3)
-        return eigenface_file
+    def _get_temp_filename(cls):
+        return os.path.join(tempfile._get_default_tempdir(), next(tempfile._get_candidate_names()))
 
     @classmethod
     def find(cls, history, similarity_method='cosine', face_source_filter='all', max_results=10, job_options=['r', 'inline']):
-        """
-        """
-        face_file = cls.__get_eigenface_file_from_image(history.in_face.full_face_path, history.in_face.bbox)
+        # load and process image data, apply model then save to temp file
+        img_data = ImageLibrary.process_image(history.in_face.face_img_path, history.in_face.bbox)
+        eigenface = ModelBuilder.apply(img_data)
+        eigenfile = cls._get_temp_filename()
+        ModelBuilder.dump_eigenface(eigenface, eigenfile)
 
         # Build options for running the map reduce job
-        opt = [FACE_OPTION, face_file,
+        opt = [FACE_OPTION, eigenfile,
                FACE_SOURCE_FILTER, face_source_filter,
                SIMILARITY_METHOD, similarity_method,
                MAX_RESULTS_OPTION, str(max_results)]
@@ -38,7 +36,7 @@ class FindSimilars():
         [opt.append(str(o)) for o in job_options]
 
         # Leave the input dataset for last
-        opt.append('dataset.dat')
+        opt.append(ModelBuilder.dataset_filename)
 
         # flag history as started
         history.status = history.RUNNING
@@ -64,6 +62,9 @@ class FindSimilars():
             history.status = history.ERROR
             history.output = str(e)
 
+        # cleanup temp file
+        os.remove(eigenfile)
+
         # save history object
         history.finished_at = timezone.now()
         history.save()
@@ -81,7 +82,7 @@ class FindSimilarsMapReduce(MRJob):
 
     def load_options(self, args):
         super(FindSimilarsMapReduce, self).load_options(args)
-        self.new_eigenface = helpers.load(getattr(self.options, FACE_OPTION[2:]))
+        self.new_eigenface = ModelBuilder.load_eigenface(getattr(self.options, FACE_OPTION[2:]))
         self.max_resutls = getattr(self.options, MAX_RESULTS_OPTION[2:])
         self.face_source_filter = getattr(self.options, FACE_SOURCE_FILTER[2:])
         self.similarity_method = getattr(self.options, SIMILARITY_METHOD[2:])
@@ -97,10 +98,10 @@ class FindSimilarsMapReduce(MRJob):
             distance = np.linalg.norm(a-b)
             return 1 / (1 + distance)
         else:
-            return 1 - spatial.distance.cosine(a, b)
+            return 1.0 - spatial.distance.cosine(a, b)
 
     def can_use_source(self, source):
-        return self.face_source_filter == 'all' or (self.face_source_filter == 'actor' and source == 'A') or (self.face_source_filter == 'user' and source == 'U')
+        return self.face_source_filter == 'all' or (self.face_source_filter == 'actor' and source == Face.ACTOR_SOURCE) or (self.face_source_filter == 'user' and source == Face.USER_SOURCE)
 
     def mapper(self, _, line):
         """

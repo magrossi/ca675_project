@@ -78,7 +78,7 @@ postgres=# \d
 
 The below is a sample Python script that will use the app to search for similar faces (when the UI is done we can use the same code to submit our searches).
 
-This script takes advantage of the `demo` user that is created in the seed.py script and will return the 10 most similar faces alongside their similarity score (value in the `[0,1]` interval). The higher the score, the more similar the faces are.
+This script takes advantage of the `demo` user that is created in the seed.py script and will return the 10 most similar faces alongside their similarity score. The higher the score, the more similar the faces are.
 
 The `FindSimilars.find()` function accepts some parameters besides just the `history` object:
 
@@ -86,7 +86,7 @@ The `FindSimilars.find()` function accepts some parameters besides just the `his
 find(history, similarity_method='cosine', face_source_filter='all', max_results=10, job_options=['r', 'inline'])
 ```
 
-* `similarity_method=` defines which similarity function will be used. Possible functions are `cosine` and `euclidean`. The returned faces may vary depending on the function used.
+* `similarity_method=` defines which similarity function will be used. Possible functions are `cosine` (score ranges from -1,1) and `euclidean` (from 0,1). The returned faces may vary depending on the function used (but not by that much!).
 * `face_source_filter=` will filter the search depending on the source of the face image, `actor` will only look for images of actors, `user` only for user images and `all` will look for similarity between all images.
 * `max_results=` defines the number of similar faces returned
 * `job_options=` will simply forward the parameters to the `MrJob` map reduce framework. This allows us to change where the job will be run. If we want to run this in EMR for example we can pass `['r', 'emr']` as parameters. The default is `['r', 'inline']` which is ideal for running the job locally. Please refer to https://pythonhosted.org/mrjob/ for specific options available.
@@ -100,7 +100,7 @@ django.setup()
 
 from face_matcher.models import Face, Actor, History, HistoryItem
 from django.contrib.auth.models import User
-from findsimilars import FindSimilars
+from lib.findsimilars import FindSimilars
 
 user = User.objects.get(username='demo')
 face = user.face_set.first()
