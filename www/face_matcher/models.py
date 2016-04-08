@@ -20,7 +20,11 @@ class Actor(models.Model):
     class Meta:
         ordering = ('name', 'gender',)
 
+
 class Face(models.Model):
+    ACTOR_SOURCE = 'A'
+    USER_SOURCE = 'U'
+
     url = models.URLField(max_length=2000, blank=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     actor = models.ForeignKey('Actor', on_delete=models.CASCADE, null=True)
@@ -29,8 +33,8 @@ class Face(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property
-    def full_face_path(self):
-        return os.path.join(settings.IMG_BASE_DIR, self.face_img_path)
+    def face_source(self):
+        return self.ACTOR_SOURCE if self.actor is not None else self.USER_SOURCE
 
     @property
     def bbox(self):

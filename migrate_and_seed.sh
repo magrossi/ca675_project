@@ -36,7 +36,7 @@ django.setup()
 
 from face_matcher.models import Face, Actor, History, HistoryItem
 from django.contrib.auth.models import User
-from findsimilars import FindSimilars
+from lib.findsimilars import FindSimilars
 
 user = User.objects.get(username='demo')
 face = user.face_set.first()
