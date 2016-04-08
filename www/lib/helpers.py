@@ -66,32 +66,62 @@ class MetaImageLibrary(type):
 class ImageLibrary():
     __metaclass__ = MetaImageLibrary
 
+    _LOCAL_STORAGE = 'local'
+    _S3_STORAGE = 's3'
+
+    @classmethod
+    def _get_s3bucket(cls):
+        return S3Bucket(settings.IMAGE_STORAGE_S3_BUCKET,
+                        access_key=settings.IMAGE_STORAGE_S3_ACCESS_KEY,
+                        secret_key=settings.IMAGE_STORAGE_S3_SECRET_KEY,
+                        base_url='http://{}.s3.amazonaws.com'.format(settings.IMAGE_STORAGE_S3_BUCKET))
+
+    @classmethod
+    def save_image(cls, raw_img, rel_img_path):
+        if settings.IMAGE_STORAGE_MODE == cls._LOCAL_STORAGE:
+            filename = os.path.join(settings.IMAGE_STORAGE_LOCAL_DIR, rel_img_path)
+            full_dir = os.path.dirname(filename)
+            if not os.path.exists(full_dir):
+                os.makedirs(full_dir)
+            with open(filename, 'wb') as f:
+                f.write(raw_img)
+        else:
+            s3 = cls._get_s3bucket()
+            s3.put(settings.IMAGE_STORAGE_S3_PREFIX + rel_img_path, raw_img)
+
+    @classmethod
+    def del_image(cls, rel_img_path):
+        if settings.IMAGE_STORAGE_MODE == cls._LOCAL_STORAGE:
+            filename = os.path.join(settings.IMAGE_STORAGE_LOCAL_DIR, rel_img_path)
+            if os.path.isfile(filename):
+                os.remove(filename)
+        else:
+            filename = settings.IMAGE_STORAGE_S3_PREFIX + rel_img_path
+            s3 = cls._get_s3bucket()
+            if filename in s3:
+                s3.delete(filename)
+
     @classmethod
     def process_image(cls, img_path, bbox):
-        return cls.process_images([(img_path, bbox)])[0]
+        return list(cls.process_images([(img_path, bbox)]))[0]
 
     @classmethod
     def process_images(cls, image_bbox_list):
-        if settings.IMAGE_STORAGE_MODE == 'local':
+        if settings.IMAGE_STORAGE_MODE == cls._LOCAL_STORAGE:
             return cls._process_images_local(image_bbox_list)
         else:
             return cls._process_images_s3(image_bbox_list)
 
     @classmethod
     def list_all(cls):
-        rel_filenames = []
-        if settings.IMAGE_STORAGE_MODE == 'local':
+        if settings.IMAGE_STORAGE_MODE == cls._LOCAL_STORAGE:
             for path, subdirs, files in os.walk(settings.IMAGE_STORAGE_LOCAL_DIR):
                 for name in files:
-                    rel_filenames.append(os.path.relpath(os.path.join(path, name), settings.IMAGE_STORAGE_LOCAL_DIR))
+                    yield os.path.relpath(os.path.join(path, name), settings.IMAGE_STORAGE_LOCAL_DIR)
         else:
-            s3 = S3Bucket(settings.IMAGE_STORAGE_S3_BUCKET,
-                          access_key=settings.IMAGE_STORAGE_S3_ACCESS_KEY,
-                          secret_key=settings.IMAGE_STORAGE_S3_SECRET_KEY,
-                          base_url='http://{}.s3.amazonaws.com'.format(settings.IMAGE_STORAGE_S3_BUCKET))
+            s3 = cls._get_s3bucket()
             for (key, modify, etag, size) in s3.listdir(prefix=settings.IMAGE_STORAGE_S3_PREFIX):
-                rel_filenames.append(os.path.relpath(key, settings.IMAGE_STORAGE_S3_PREFIX))
-        return rel_filenames
+                yield os.path.relpath(key, settings.IMAGE_STORAGE_S3_PREFIX)
 
     @classmethod
     def _pre_process_image(cls, image, bbox):
@@ -114,21 +144,14 @@ class ImageLibrary():
 
     @classmethod
     def _process_images_local(cls, image_bbox_list):
-        img_list = []
         for img_path, bbox in image_bbox_list:
             image = Image.open(os.path.join(settings.IMAGE_STORAGE_LOCAL_DIR, img_path))
-            img_list.append(cls._pre_process_image(image, bbox))
-        return img_list
+            yield cls._pre_process_image(image, bbox)
 
     @classmethod
     def _process_images_s3(cls, image_bbox_list):
-        img_list = []
-        s3 = S3Bucket(settings.IMAGE_STORAGE_S3_BUCKET,
-                      access_key=settings.IMAGE_STORAGE_S3_ACCESS_KEY,
-                      secret_key=settings.IMAGE_STORAGE_S3_SECRET_KEY,
-                      base_url='http://{}.s3.amazonaws.com'.format(settings.IMAGE_STORAGE_S3_BUCKET))
+        s3 = cls._get_s3bucket()
         for img_path, bbox in image_bbox_list:
             raw_img = s3.get(settings.IMAGE_STORAGE_S3_PREFIX + img_path).read()
             image = Image.open(StringIO(raw_img))
-            img_list.append(cls._pre_process_image(image, bbox))
-        return img_list
+            yield cls._pre_process_image(image, bbox)

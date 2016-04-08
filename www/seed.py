@@ -24,7 +24,7 @@ with open(facescrub_dataset_file, 'rb') as dset:
 
     # Create new Actors/Faces based on existing image files
     # First obtain a listing of all existing images (especially usefull when using S3)
-    filenames = Set(ImageLibrary.list_all())
+    filenames = Set(list(ImageLibrary.list_all()))
 
     actor = None # Actors are in order in the dataset so can leverage it
     for id, name, gender, url, bbox, sha256, relative_img_path in reader:
