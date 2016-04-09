@@ -27,7 +27,7 @@ class ModelBuilder():
     @classmethod
     def apply(cls, img_data):
         model = cls.load()
-        return model.transform([img_data])
+        return model.transform([img_data])[0]
 
     @classmethod
     def dump(cls, model):
@@ -52,7 +52,22 @@ class ModelBuilder():
         with open(cls.dataset_filename, 'wb') as f:
             for index, eigenface in enumerate(eigenfaces):
                 face_id, face_source = data_labels[index]
-                f.write('"{}","{}","{}"\n'.format(face_id, face_source, ' '.join(map(str, eigenface))))
+                f.write('"{}","{}","{}"\n'.format(face_id, face_source, cls.eigenface_to_str(eigenface)))
+
+    @classmethod
+    def append_dataset(cls, eigenface, data_label):
+        # append to the existing dataset the eigenface and associated data_label
+        with open(cls.dataset_filename, 'a') as f:
+            face_id, face_source = data_label
+            f.write('"{}","{}","{}"\n'.format(face_id, face_source, cls.eigenface_to_str(eigenface)))
+
+    @classmethod
+    def eigenface_to_str(cls, eigenface):
+        return ' '.join(map(str, eigenface))
+
+    @classmethod
+    def str_to_eigenface(cls, eigenstr):
+        return np.asarray(map(float, eigenstr.split()))
 
 class MetaImageLibrary(type):
     @property

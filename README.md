@@ -1,6 +1,6 @@
 # CA675 Group Project ![Build status](https://circleci.com/gh/magrossi/ca675_project.svg?style=shield)
 
-TODO - description
+Similar face image finder app built in Python, Django, Postgres and Nginx in a containerized microservices environment.
 
 ### Bootstrapping
 

@@ -79,6 +79,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 FACEREC_IMG_SIZE = (int(os.environ['FACEREC_WIDTH']), int(os.environ['FACEREC_HEIGHT']))
 FACEREC_COMPONENTS = int(os.environ['FACEREC_COMPONENTS'])
+FACEREC_MAX_SEED_IMG = 0 if os.getenv('FACEREC_MAX_SEED_IMG') is None else int(os.getenv('FACEREC_MAX_SEED_IMG'))
 
 _IMG_BASE_DIR = os.getenv('IMG_BASE_DIR')
 IMAGE_STORAGE_MODE = 'local' if _IMG_BASE_DIR else 's3'
