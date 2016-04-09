@@ -45,6 +45,7 @@ RUN pip install --no-cache-dir virtualenv
 ENV FACEREC_WIDTH 100
 ENV FACEREC_HEIGHT 100
 ENV FACEREC_COMPONENTS 150
+ENV FACEREC_MAX_SEED_IMG 1000
 
 ### Directories
 ENV WORKDIR /usr/src/app
@@ -58,14 +59,14 @@ VOLUME $WORKDIR
 ### If both assigned, will use local
 
 # Local
-# ENV IMG_BASE_DIR $WORKDIR/static/images
+ENV IMG_BASE_DIR $WORKDIR/static/images
 
 # S3
-ENV IMG_BASE_S3_ACCESS_KEY AKIAJLG5OTIWETNMOIZA
-ENV IMG_BASE_S3_SECRET_KEY 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
-ENV IMG_BASE_S3_BUCKET mgrossi-ca675
-ENV IMG_BASE_S3_PREFIX faces/
-ENV IMG_BASE_S3_REGION eu-west-1
+# ENV IMG_BASE_S3_ACCESS_KEY <your access key>
+# ENV IMG_BASE_S3_SECRET_KEY <your secret key>
+# ENV IMG_BASE_S3_BUCKET <your bucket>
+# ENV IMG_BASE_S3_PREFIX faces/
+# ENV IMG_BASE_S3_REGION eu-west-1
 
 ### Requirements
 COPY requirements.txt $WORKDIR
@@ -73,9 +74,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . $WORKDIR
 
 ### Remote static facescrub_dataset file
-### Fetch datasets from Google Drive
-ENV FACESCRUB_DRIVE_ID 0Bzt4aP7vYnOTYXpodUFmMlY4WVU
-ADD https://googledrive.com/host/$FACESCRUB_DRIVE_ID/facescrub_dataset.tar.gz $WORKDIR/
+### Fetch datasets from Google Drive (disabled for now - not needed at the moment)
+# ENV FACESCRUB_DRIVE_ID 0Bzt4aP7vYnOTYXpodUFmMlY4WVU
+# ADD https://googledrive.com/host/$FACESCRUB_DRIVE_ID/facescrub_dataset.tar.gz $WORKDIR/
 # ADD https://googledrive.com/host/$FACESCRUB_DRIVE_ID/seed_images.tar.gz $IMG_BASE_DIR/
 
 CMD /usr/local/bin/gunicorn web.wsgi:application -w 2 -b :8000 --reload

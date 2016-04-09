@@ -69,6 +69,13 @@ class FindSimilars():
         history.finished_at = timezone.now()
         history.save()
 
+        # append this face to the new dataset if and only if:
+        # - it is a user face (actors are already there!)
+        # - face is not in another history item (in which case it would be already there as well!)
+        if (history.in_face.face_source == Face.USER_SOURCE and History.objects.exclude(id=history.id).filter(in_face_id=history.in_face.id).count() == 0):
+            data_label = (history.in_face.id, history.in_face.face_source)
+            ModelBuilder.append_dataset(eigenface, data_label)
+
 class FindSimilarsMapReduce(MRJob):
     """
     """
@@ -113,7 +120,7 @@ class FindSimilarsMapReduce(MRJob):
         """
         for face_id, face_source, eigenface_str in csv.reader(StringIO.StringIO(line)):
             if (self.can_use_source(face_source)):
-                user_eigenface = np.asarray(map(float, eigenface_str.split()))
+                user_eigenface = ModelBuilder.str_to_eigenface(eigenface_str)
                 yield None, (face_id, face_source, self.similarity(user_eigenface, self.new_eigenface))
 
     def combiner(self, _, user_similarities):

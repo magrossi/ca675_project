@@ -45,6 +45,9 @@ with open(facescrub_dataset_file, 'rb') as dset:
             face.save()
             faces_ct += 1
 
+            if (settings.FACEREC_MAX_SEED_IMG > 0 and faces_ct >= settings.FACEREC_MAX_SEED_IMG):
+                break
+
 # Create a demo user with demo picture
 from django.contrib.auth.models import User
 

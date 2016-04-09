@@ -17,9 +17,9 @@ docker exec -it ca675project_www_1 bash
 
 
 docker-compose down && docker-compose build && docker-compose up -d
-docker exec -it ca675project_www_1 /usr/local/bin/python manage.py migrate
-docker exec -it ca675project_www_1 /usr/local/bin/python seed.py
-docker exec -it ca675project_www_1 /usr/local/bin/python build_datasets.py
+docker exec -it ca675project_www_1 /usr/local/bin/python manage.py migrate && \
+docker exec -it ca675project_www_1 /usr/local/bin/python seed.py && \
+docker exec -it ca675project_www_1 /usr/local/bin/python build_datasets.py && \
 docker exec -it ca675project_www_1 /usr/local/bin/python manage.py test
 
 python manage.py makemigrations your_app_label
