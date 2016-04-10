@@ -1,10 +1,27 @@
 www:
   restart: always
+  command: /usr/local/bin/gunicorn web.wsgi:application -w 2 -b :8000 --reload
   build: ./www
   expose:
     - "8000"
   links:
     - postgres:postgres
+    - redis:redis
+  env_file: .env
+
+redis:
+  restart: always
+  image: redis
+
+celery:
+  restart: always
+  command: /usr/local/bin/celery -A web worker -l debug
+  build: ./www
+  volumes_from:
+    - www
+  links:
+    - postgres:postgres
+    - redis:redis
   env_file: .env
 
 nginx:

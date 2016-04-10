@@ -6,7 +6,6 @@ django.setup()
 
 from face_matcher.models import Face
 
-# make this method asynchronous using celery
 def build_dataset():
     start_time = time.time()
 

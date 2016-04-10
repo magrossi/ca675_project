@@ -5,6 +5,7 @@ from django.conf import settings
 from simples3 import S3Bucket
 from StringIO import StringIO
 import os, os.path, numpy as np
+import redis
 
 class MetaModelBuilder(type):
     @property
@@ -31,11 +32,13 @@ class ModelBuilder():
 
     @classmethod
     def dump(cls, model):
-        joblib.dump(model, cls._model_filename, compress=3)
+        with redis.Redis(settings.REDIS_HOST).lock(cls._model_filename):
+            joblib.dump(model, cls._model_filename, compress=3)
 
     @classmethod
     def load(cls):
-        return joblib.load(cls._model_filename)
+        with redis.Redis(settings.REDIS_HOST).lock(cls._model_filename):
+            return joblib.load(cls._model_filename)
 
     @classmethod
     def dump_eigenface(cls, eigenface, filename):
@@ -49,17 +52,19 @@ class ModelBuilder():
     def dump_dataset(cls, eigenfaces, data_labels):
         # create and save the dataset of eigenfaces by projecting the processed
         # image data into an orthogonal plane using the fitted model
-        with open(cls.dataset_filename, 'wb') as f:
-            for index, eigenface in enumerate(eigenfaces):
-                face_id, face_source = data_labels[index]
-                f.write('"{}","{}","{}"\n'.format(face_id, face_source, cls.eigenface_to_str(eigenface)))
+        with redis.Redis(settings.REDIS_HOST).lock(cls.dataset_filename):
+            with open(cls.dataset_filename, 'wb') as f:
+                for index, eigenface in enumerate(eigenfaces):
+                    face_id, face_source = data_labels[index]
+                    f.write('"{}","{}","{}"\n'.format(face_id, face_source, cls.eigenface_to_str(eigenface)))
 
     @classmethod
     def append_dataset(cls, eigenface, data_label):
         # append to the existing dataset the eigenface and associated data_label
-        with open(cls.dataset_filename, 'a') as f:
-            face_id, face_source = data_label
-            f.write('"{}","{}","{}"\n'.format(face_id, face_source, cls.eigenface_to_str(eigenface)))
+        with redis.Redis(settings.REDIS_HOST).lock(cls.dataset_filename):
+            with open(cls.dataset_filename, 'a') as f:
+                face_id, face_source = data_label
+                f.write('"{}","{}","{}"\n'.format(face_id, face_source, cls.eigenface_to_str(eigenface)))
 
     @classmethod
     def eigenface_to_str(cls, eigenface):
