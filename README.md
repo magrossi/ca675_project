@@ -73,6 +73,9 @@ postgres=# \d
  public | face_matcher_upload_id_seq        | sequence | postgres
 (21 rows)
 ```
+### Building the model and eigenface datasets
+The datasets need to be created after the first seeding of the face database is performed. It is against these files that the face similarity search is performed and they can be re-created whenever there are a significant number of new faces added to the database. This allows the algorithm to account for more variability and perform better.
+The datasets can be re-built asynchronously via the web application as well as synchronously. For the synchronous version (in reality it runs asynchronously but it waits for the results and reports on execution state changes throughout) see `build_datasets.py` on the root of the `www` app. You can use the code there to run it async from the web app, but instead of waiting for the result you can simply call the task `face_matcher.tasks.build_datasets.delay()` and monitor the state in other ways.
 
 ### Searching similar faces
 The below are sample Python scripts that will use the app to search for similar faces `synchronously` and `asynchronously`. The synchronous method IS NOT suitable for running from the UI code as it will block the web service from responding until the search is completed (might take some time). For invoking searches from the UI use the asynchronous verion.
