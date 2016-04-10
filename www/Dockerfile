@@ -6,7 +6,6 @@ RUN set -ex \
   && apt-get install -y postgresql-client libblas-dev liblapack-dev libatlas-base-dev gfortran \
   && apt-get purge -y python.*
 
-
 ### Python deps
 ENV LANG C.UTF-8
 ENV GPG_KEY C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF
@@ -78,5 +77,3 @@ COPY . $WORKDIR
 # ENV FACESCRUB_DRIVE_ID 0Bzt4aP7vYnOTYXpodUFmMlY4WVU
 # ADD https://googledrive.com/host/$FACESCRUB_DRIVE_ID/facescrub_dataset.tar.gz $WORKDIR/
 # ADD https://googledrive.com/host/$FACESCRUB_DRIVE_ID/seed_images.tar.gz $IMG_BASE_DIR/
-
-CMD /usr/local/bin/gunicorn web.wsgi:application -w 2 -b :8000 --reload
