@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load staticfiles widget_tweaks face_matcher_extras %}
+
+{% block content %}
+
+  {% header %}
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 text-center">
+        <h2 class="section-heading">LogIn</h2>
+        <form action="{% url 'login' %}" method="post">
+          {% csrf_token %}
+          {% for field in form %}
+            {% render_field field class+="form-control" placeholder=field.label %}
+            <br>
+            {% for error in field.errors %}
+              <div class="alert alert-danger" role="alert">{{ error|escape }}</div>
+            {% endfor %}
+          {% endfor %}
+          <input type="submit" class="btn btn-primary btn-xl page-scroll" value="Sign In"/>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
