@@ -9,6 +9,10 @@ import redis
 
 class MetaModelBuilder(type):
     @property
+    def model_filename(cls):
+        return cls._model_filename
+
+    @property
     def dataset_filename(cls):
         return cls._dataset_filename
 
@@ -32,13 +36,13 @@ class ModelBuilder():
 
     @classmethod
     def dump(cls, model):
-        with redis.Redis(settings.REDIS_HOST).lock(cls._model_filename):
-            joblib.dump(model, cls._model_filename, compress=3)
+        with redis.Redis(settings.REDIS_HOST).lock(cls.model_filename):
+            joblib.dump(model, cls.model_filename, compress=3)
 
     @classmethod
     def load(cls):
-        with redis.Redis(settings.REDIS_HOST).lock(cls._model_filename):
-            return joblib.load(cls._model_filename)
+        with redis.Redis(settings.REDIS_HOST).lock(cls.model_filename):
+            return joblib.load(cls.model_filename)
 
     @classmethod
     def dump_eigenface(cls, eigenface, filename):
