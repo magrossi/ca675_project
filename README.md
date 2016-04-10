@@ -74,7 +74,7 @@ postgres=# \d
 (21 rows)
 ```
 
-### Example for searching similar faces
+### Searching similar faces
 
 The below is a sample Python script that will use the app to search for similar faces (when the UI is done we can use the same code to submit our searches).
 
@@ -112,3 +112,27 @@ print 'Similarity results: {} [{}]'.format(history.status, history.output)
 for item in history.historyitem_set.all():
   print '{}, {}'.format(item.face.id, item.similarity_score)
 ```
+
+### Deploying to AWS
+
+One can provision the application stack to an Ec2 instance through the following steps:
+1. Install and configure the AWS CLI under one of your IAM users in your chosen region, https://aws.amazon.com/cli/
+1. Create a VPC for the Ec2 instnace and take note of its ID, http://docs.aws.amazon.com/cli/latest/reference/ec2/create-vpc.html
+1. Create a subnet for the VPC and take note of the AZ it was created under, http://docs.aws.amazon.com/cli/latest/reference/ec2/create-subnet.html
+1. Along with the desired instance name, supply the VPC id and subnet's zone to the provisioning script: `NAME=fm-aws VPC_ID=someId ZONE=subnetZoneLetter REGION=someRegion sh deploy.sh -p`
+1. In your Ec2 console you will notice that the according instance has been provisioned under a new 'docker-machine' security group. This group's inbound traffic rules should be updated to allow the traffic types HTTP, PostgreSQL and SSH from all sources, http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html#adding-security-group-rule
+1. Under your RDS console, create a Postgres "Dev/Test" instance type using the 9.4.7 engine in a db.t2.micro machine while taking note of the DB identifier, username and password. The instance set up should create new VPC, subnet and security group while being publicly accessible, http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html#CHAP_GettingStarted.Creating.PostgreSQL
+1. When the RDS instance is created take note of its endpoint and create a .env_prod file in the following format:
+```
+  DJANGO_ENV=production
+  SECRET_KEY={{some_SHA}}
+  DB_NAME={{name}}
+  DB_USER={{user}}
+  DB_PASS={{pass}}
+  DB_SERVICE={{RDS_endpoint}}
+  DB_PORT={{port}}
+```
+
+One can deploy the application through the following steps:
+1. Simply run the deploy script, `NAME=aws-fm sh deploy.sh`
+1. Preview the deployed application, `open http://$(docker-machine ip aws-fm-med)`
