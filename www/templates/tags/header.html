@@ -14,9 +14,7 @@
     <li>
       <a class="page-scroll" href="{{ prefix }}#about">About</a>
     </li>
-    <li>
-      <a class="page-scroll" href="{{ prefix }}#contact">Contact</a>
-    </li>
+
     {% if user.is_authenticated %}
       <li>
         <a class="page-scroll" href="{% url 'face_matcher:faces' %}">{{ user.username }}</a>
@@ -29,6 +27,8 @@
         <a class="page-scroll" href="{{ prefix }}#user">Sign In</a>
       </li>
     {% endif %}
-
+    <li>
+      <a class="page-scroll" href="{{ prefix }}#contact">Contact</a>
+    </li>
   </ul>
 </div>
