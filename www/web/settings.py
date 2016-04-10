@@ -9,14 +9,15 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 import os
 
+IS_PRODUCTION = os.environ.get('DJANGO_ENV') == 'production'
+
+DEBUG = True
+TEMPLATE_DEBUG = not IS_PRODUCTION
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 SECRET_KEY = os.environ['SECRET_KEY']
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 

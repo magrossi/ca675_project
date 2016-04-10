@@ -1,0 +1,21 @@
+www:
+  restart: always
+  build: ./www
+  expose:
+    - "8000"
+  env_file:
+    - .env
+    - .env_prod
+
+nginx:
+  restart: always
+  build: ./nginx/
+  ports:
+    - "80:80"
+  volumes:
+    - /www/static
+    - /www/media
+  volumes_from:
+    - www
+  links:
+    - www:www
