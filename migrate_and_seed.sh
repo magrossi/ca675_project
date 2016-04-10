@@ -87,3 +87,19 @@ export TERMINFO=/etc/terminfo
 
   ENV TERM linux
   ENV TERMINFO /etc/terminfo
+
+
+
+£££££££££££££££££££££££££
+
+data_img = list() # will store img_path, bbox list for processing
+data_lbl = list() # will store the labeling information
+
+for face in Face.objects.all():
+    data_img.append((faceface_img_path, face.bbox))
+    data_lbl.append((face.id, face.face_source))
+
+# load and pre-process all images
+proc_data = list(ImageLibrary.process_images(data_img))
+# build model and apply transformations
+model, eigenfaces = ModelBuilder.build(proc_data)
