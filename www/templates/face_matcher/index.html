@@ -40,31 +40,35 @@
   <section id="user">
     <div class="container">
       <div class="row">
-        <div class="col-lg-8 col-lg-offset-2 text-center">
-          <h2 class="section-heading">Faces</h2>
-          <hr class="primary">
-        </div>
+        
+
         <div class="col-lg-8 col-lg-offset-2 text-center">
           <i class="fa fa-4x fa-diamond wow bounceIn text-primary"></i> <br>
+          <div class="col-lg-8 col-lg-offset-2 text-center">
+          <hr class="primary">
+        </div>
+        <br><br>
 
           {% if not user.is_authenticated %}
 
-            <h3>Please sign in</h3>
-
+            <h3>Log in</h3>
+            <br>
             <form action="{% url 'login' %}" method="post">
               {% csrf_token %}
               {% render_field form.username class+="form-control" placeholder=form.username.label %}
               <br>
               {% render_field form.password class+="form-control" placeholder=form.password.label%}
               <br>
-              <input type="submit" class="btn btn-primary btn-xl page-scroll" value="Sign In"/>
+              <input type="submit" class="btn btn-primary btn-xl page-scroll" value="Log In"/>
             </form>
-            <p><a href="{% url 'face_matcher:registration' %}">Sign Up</a></p>
+            <br>
+            <h3>New to Face Matcher? Sign up</h3>
+            <br>
+            <p><a href="{% url 'face_matcher:registration' %}"><input type="submit" class="btn btn-primary btn-xl page-scroll" value="Sign Up"/></a></p>
           {% else %}
+            
             <br>
-            <h3>Please Upload your image</h3>
-            <br>
-            <a href="{% url 'face_matcher:faces' %}" class="btn btn-primary btn-xl page-scroll">Go and Upload</a>
+            <a href="{% url 'face_matcher:faces' %}" class="btn btn-primary btn-xl page-scroll">Upload your image</a>
           {% endif %}
         </div>
       </div>
@@ -80,13 +84,13 @@
         </div>
         <div class="col-lg-4 col-lg-offset-2 text-center">
           <i class="fa fa-phone fa-3x wow bounceIn"></i>
-          <p>0877866017</p>
+          <p>011111111</p>
         </div>
         <div class="col-lg-4 text-center">
           <i class="fa fa-envelope-o fa-3x wow bounceIn" data-wow-delay=".1s"></i>
           <p>
             <a href="mailto:your-email@your-domain.com">
-              <font color="white">@mail.dcu.ie</font>
+              <font color="white">face-matcher@mail.dcu.ie</font>
             </a>
           </p>
         </div>

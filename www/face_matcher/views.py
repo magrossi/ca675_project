@@ -42,18 +42,20 @@ def faces(request):
                 ImageLibrary.save_image(img_file.read(), img_path)
             except:
                 raise  # todo: handle save exception
-
+            face_bbox = form.cleaned_data['face_bbox']
             face = Face.objects.create(
                 user=request.user,
                 url='http://google.com/',  # todo: fixme
-                face_bbox='fixme',  # fixme
+                face_bbox=face_bbox,
                 face_img_path=img_path,
             )
             history = History.objects.create(user=request.user, in_face=face)
-            find_similars.delay(history.id)
+
+            face_source_filter = form.cleaned_data['face_source_filter']
+            find_similars.delay(history.id, face_source_filter=face_source_filter)
 
     context_dict = {
         'form': form and form or ImageUploadForm(),
-        'history': History.objects.all()
+        'history': History.objects.filter(user=request.user)
     }
     return render(request, 'face_matcher/faces.html', context_dict)

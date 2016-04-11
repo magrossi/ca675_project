@@ -20,15 +20,19 @@
         <a class="page-scroll" href="{% url 'face_matcher:faces' %}">{{ user.username }}</a>
       </li>
       <li>
+      <a class="page-scroll" href="{{ prefix }}#contact">Contact</a>
+      </li>
+      <li>
         <a class="page-scroll" href="{% url 'logout' %}">Log Out</a>
       </li>
     {% else %}
       <li>
-        <a class="page-scroll" href="{{ prefix }}#user">Sign In</a>
+        <a class="page-scroll" href="{{ prefix }}#user">Log In</a>
+      </li>
+      <li>
+      <a class="page-scroll" href="{{ prefix }}#contact">Contact</a>
       </li>
     {% endif %}
-    <li>
-      <a class="page-scroll" href="{{ prefix }}#contact">Contact</a>
-    </li>
+
   </ul>
 </div>
