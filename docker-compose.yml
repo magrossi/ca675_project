@@ -6,10 +6,8 @@ www:
     - "8000"
   links:
     - postgres:postgres
-    - redis:redis  
+    - redis:redis
   env_file: .env
-  volumes:
-    - ./www:/usr/src/app
 
 redis:
   restart: always

@@ -43,8 +43,8 @@
                 <span class="fileinput-exists">Change</span>
                 <input type="file" name="image">
               </span>
-                <!-- <input type="hidden" name="face_bbox"/>
-                <input type="submit" class="btn btn-default fileinput-exists"/> -->
+                <input type="hidden" name="face_bbox"/>
+                <input type="submit" class="btn btn-default fileinput-exists"/>
               </div>
             </div>
           </form>
@@ -85,7 +85,6 @@
                         <div class="progress">
                           <div class="progress-bar progress-bar-info" role="progressbar"
                                aria-valuenow="{% multiply_100 hi.similarity_score %}"
-                               aria-valuemin="0" aria-valuemax="100"
                                style="width:{% multiply_100 hi.similarity_score %}%; color: #f05f40;">
                             {% multiply_100 hi.similarity_score %}%
                           </div>
