@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load staticfiles widget_tweaks face_matcher_extras %}
+
+{% block content %}
+
+  <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+      {% header %}
+    </div>
+  </nav>
+
+  <section class="bg-primary" id="about">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 text-center">
+          <h2 class="section-heading">Face Matcher</h2>
+          <hr class="light">
+          <!--<p>Upload your photo and select face:</p>-->
+          <form enctype="multipart/form-data" method="post">
+            {% csrf_token %}
+            {% for error in form.image.errors %}
+              <div class="alert alert-danger" role="alert">{{ error|escape }}</div>
+            {% endfor %}
+            <!-- {% for error in form.face_bbox.errors %}
+              <div class="alert alert-danger" role="alert">{{ error|escape }}</div>
+            {% endfor %} -->
+            <div class="fileinput fileinput-new" data-provides="fileinput">
+              <div class="fileinput-new thumbnail" style="width: 400px; height: 350px;">
+                <img src="{% static 'images/placeholder.png' %}" alt="...">
+              </div>
+              <div class="fileinput-preview fileinput-exists thumbnail"
+                   style="max-width: 800px; max-height: 500px;"></div>
+              <div>
+                Compare with:
+                <p>
+                  <label class="radio-inline"><input type="radio" value="all" name="face_source_filter"
+                                                     checked>All</label>
+                  <label class="radio-inline"><input type="radio" value="user" name="face_source_filter">Users</label>
+                  <label class="radio-inline"><input type="radio" value="actor" name="face_source_filter">Actors</label>
+                </p>
+              <span class="btn btn-default btn-file">
+                <span class="fileinput-new">Browse image</span>
+                <span class="fileinput-exists">Change</span>
+                <input type="file" name="image">
+              </span>
+                <input type="hidden" name="face_bbox"/>
+                <input type="submit" class="btn btn-default fileinput-exists"/>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="container" id="top-page">
+    <div class="row">
+      <div class="col-lg-12">
+        <h2 class="text-center">History</h2>
+
+        <ul class="list-group">
+          {% for h in history %}
+            <li class="list-group-item" id="history-{{ h.id }}">
+
+              <div class="row">
+                <div class="col-sm-6 col-md-4">
+                  <div class="thumbnail">
+                    <img src="/static/images/{{ h.in_face.face_img_path }}" alt="Main image" class="img-responsive">
+                  </div>
+                  <span>{{ h.created_at }}</span>
+                  <p class="caption">
+                    <span class="label label-success">{{ h.get_status_display }}</span>
+                    {% if h.status == 'P' %}
+                      <!-- <button class="btn btn-xs btn-primary refresh-page" data-id="{{ h.id }}">
+                        <i class="glyphicon glyphicon-refresh"></i> Refresh
+                      </button> -->
+                    {% endif %}
+                  </p>
+                </div>
+
+                <div class="col-sm-6 col-md-8 row-eq-height row">
+                  {% for hi in h.historyitem_set.all %}
+                    <div class="col-xs-6 col-md-3 history-item">
+                    <span class="thumbnail">
+                      <img src="/static/images/{{ hi.face.face_img_path }}" class="img-responsive">
+                        <div class="progress">
+                          <div class="progress-bar progress-bar-info" role="progressbar"
+                               aria-valuenow="{% multiply_100 hi.similarity_score %}"
+                               style="width:{% multiply_100 hi.similarity_score %}%; color: #f05f40;">
+                            {% multiply_100 hi.similarity_score %}%
+                          </div>
+                        </div>
+                    </span>
+                    </div>
+                    {% empty %}
+                    Empty set
+                  {% endfor %}
+                </div>
+              </div>
+            </li>
+            {% empty %}
+            <p>You don't have history yet.</p>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/css/jasny-bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'css/jquery.Jcrop.min.css' %}" type="text/css"/>
+  <link rel="stylesheet" href="{% static 'css/faces.css' %}" type="text/css"/>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/js/jasny-bootstrap.min.js"></script>
+  <script src="{% static 'js/jquery.Jcrop.min.js' %}"></script>
+  <script src="{% static 'js/faces.js' %}"></script>
+{% endblock %}

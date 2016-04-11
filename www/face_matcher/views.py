@@ -1,13 +1,61 @@
-from django.shortcuts import render
-from face_matcher.models import Face, Actor
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from .forms import ImageUploadForm
+from .models import History, Face
+from .tasks import find_similars
+from lib.helpers import ImageLibrary
+from django.contrib.auth.decorators import login_required
 
 
 def index(request):
-    faces = Face.objects.all()[:10]
-    context_dict = {'faces': faces}
+    context_dict = {
+        'form': AuthenticationForm(),
+    }
     return render(request, 'face_matcher/index.html', context_dict)
 
 
-def about(request):
-    context_dict = {'boldmessage': "I am bold font from the context"}
-    return render(request, 'face_matcher/about.html', context_dict)
+def registration(request):
+    form = None
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+
+    context_dict = {
+        'form': form and form or UserCreationForm(),
+    }
+    return render(request, 'face_matcher/registration.html', context_dict)
+
+
+@login_required
+def faces(request):
+    form = None
+    if request.method == 'POST':
+        form = ImageUploadForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            img_file = request.FILES['image']
+            # todo: set filename from settings
+            img_path = 'test/{}'.format(img_file.name)
+            try:
+                ImageLibrary.save_image(img_file.read(), img_path)
+            except:
+                raise  # todo: handle save exception
+            face_bbox = form.cleaned_data['face_bbox']
+            face = Face.objects.create(
+                user=request.user,
+                url='http://google.com/',  # todo: fixme
+                face_bbox=face_bbox,
+                face_img_path=img_path,
+            )
+            history = History.objects.create(user=request.user, in_face=face)
+
+            face_source_filter = form.cleaned_data['face_source_filter']
+            find_similars.delay(history.id, face_source_filter=face_source_filter)
+
+    context_dict = {
+        'form': form and form or ImageUploadForm(),
+        'history': History.objects.filter(user=request.user)
+    }
+    return render(request, 'face_matcher/faces.html', context_dict)

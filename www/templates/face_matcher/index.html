@@ -1,30 +1,100 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load widget_tweaks face_matcher_extras %}
 
-{% load staticfiles %}
+{% block content %}
+  <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+      {% header %}
+      <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container-fluid -->
+  </nav>
+  <header>
+    <div class="header-content">
+      <div class="header-content-inner">
+        <style>
+          h1 {
+            background-color: rgba(0, 0, 0, 0.7);
+          }
+        </style>
+        <h1>Welcome to Face Matcher</h1>
+        <hr>
+        <a href="#about" class="btn btn-primary btn-xl page-scroll">Find Out More</a>
+      </div>
+    </div>
+  </header>
+  <section class="bg-primary" id="about">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 text-center">
+          <h2 class="section-heading">Face Matcher</h2>
+          <hr class="light">
+          <p class="text-faded">This web application will support a user uploading an image of his/her face which is in
+            turn compared against a _big_ dataset of actors/actress faces, resulting in the top ten most similar matches
+            being returned to the user. The system will also give the user the option of adding his/her face to the
+            dataset, making it subject to be matched against other similar-faced users.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="user">
+    <div class="container">
+      <div class="row">
+        
 
-<html>
-    <head>
-        <title>Face Matcher</title>
-    </head>
+        <div class="col-lg-8 col-lg-offset-2 text-center">
+          <i class="fa fa-4x fa-diamond wow bounceIn text-primary"></i> <br>
+          <div class="col-lg-8 col-lg-offset-2 text-center">
+          <hr class="primary">
+        </div>
+        <br><br>
 
-    <body>
-        <h1>Face Matcher Uploads...</h1>
-        <a href="/about/">About</a>
+          {% if not user.is_authenticated %}
 
-        {% if faces %}
-            <ul>
-                {% for face in faces %}
-                <li>{{ face.actor.name }} | {{ face.actor.gender }}
-                  <div>
-                    <img src="{{ face.url }}" />
-                  </div>
-                </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <strong>There are no faces present.</strong>
-        {% endif %}
-
-
-    </body>
-</html>
+            <h3>Log in</h3>
+            <br>
+            <form action="{% url 'login' %}" method="post">
+              {% csrf_token %}
+              {% render_field form.username class+="form-control" placeholder=form.username.label %}
+              <br>
+              {% render_field form.password class+="form-control" placeholder=form.password.label%}
+              <br>
+              <input type="submit" class="btn btn-primary btn-xl page-scroll" value="Log In"/>
+            </form>
+            <br>
+            <h3>New to Face Matcher? Sign up</h3>
+            <br>
+            <p><a href="{% url 'face_matcher:registration' %}"><input type="submit" class="btn btn-primary btn-xl page-scroll" value="Sign Up"/></a></p>
+          {% else %}
+            
+            <br>
+            <a href="{% url 'face_matcher:faces' %}" class="btn btn-primary btn-xl page-scroll">Upload your image</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="bg-primary" id="contact">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 text-center">
+          <h2 class="section-heading">Let's Get In Touch!</h2>
+          <hr class="light">
+          <hr class="primary">
+        </div>
+        <div class="col-lg-4 col-lg-offset-2 text-center">
+          <i class="fa fa-phone fa-3x wow bounceIn"></i>
+          <p>011111111</p>
+        </div>
+        <div class="col-lg-4 text-center">
+          <i class="fa fa-envelope-o fa-3x wow bounceIn" data-wow-delay=".1s"></i>
+          <p>
+            <a href="mailto:your-email@your-domain.com">
+              <font color="white">face-matcher@mail.dcu.ie</font>
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

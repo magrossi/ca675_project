@@ -85,5 +85,7 @@ db.sqlite3
 .DS_Store
 *.bmp
 *.failed
+.idea/
+*.dat
 .env_prod
 migrate_and_seed.sh

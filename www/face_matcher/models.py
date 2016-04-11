@@ -2,6 +2,7 @@ import os, os.path
 from django.db import models
 from django.conf import settings
 
+
 class Actor(models.Model):
     MALE = 'M'
     FEMALE = 'F'
@@ -46,6 +47,7 @@ class Face(models.Model):
     class Meta:
         ordering = ('created_at',)
 
+
 class History(models.Model):
     PENDING = 'P'
     RUNNING = 'R'
@@ -61,13 +63,14 @@ class History(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     run_params = models.CharField(max_length=2000, null=True)
-    status = models.CharField(max_length=1,blank=False,choices=STATUS_CHOICES, default=PENDING)
+    status = models.CharField(max_length=1, blank=False, choices=STATUS_CHOICES, default=PENDING)
     in_face = models.ForeignKey('Face', on_delete=models.CASCADE)
     output = models.TextField(null=True)
     finished_at = models.DateTimeField(null=True)
 
     class Meta:
-        ordering = ('created_at',)
+        ordering = ('-created_at',)
+
 
 class HistoryItem(models.Model):
     history = models.ForeignKey('History', on_delete=models.CASCADE)
@@ -75,4 +78,4 @@ class HistoryItem(models.Model):
     similarity_score = models.FloatField(null=False)
 
     class Meta:
-        ordering = ('history','similarity_score',)
+        ordering = ('-similarity_score',)
