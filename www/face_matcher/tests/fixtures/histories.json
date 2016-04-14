@@ -1,0 +1,28 @@
+[
+   {
+      "fields":{
+         "status":"F",
+         "finished_at":"2016-04-14T15:34:37.310Z",
+         "created_at":"2016-04-14T15:34:25.626Z",
+         "in_face":2,
+         "user":1,
+         "run_params":"method=cosine, filter=all, max_results=10, options=[r, inline]",
+         "output":"Success."
+      },
+      "model":"face_matcher.history",
+      "pk":1
+   },
+   {
+      "fields":{
+         "status":"E",
+         "finished_at":"2016-04-14T15:34:37.310Z",
+         "created_at":"2016-04-14T15:34:25.626Z",
+         "in_face":1,
+         "user":2,
+         "run_params":"method=cosine, filter=all, max_results=10, options=[r, inline]",
+         "output":"Face matching query does not exist."
+      },
+      "model":"face_matcher.history",
+      "pk":2
+   }
+]

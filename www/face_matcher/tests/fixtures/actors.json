@@ -1,0 +1,20 @@
+[
+   {
+      "fields":{
+         "gender":"M",
+         "created_at":"2016-04-14T15:33:21.853Z",
+         "name":"Adam Sandler"
+      },
+      "model":"face_matcher.actor",
+      "pk":1
+   },
+   {
+      "fields":{
+         "gender":"M",
+         "created_at":"2016-04-14T15:33:21.881Z",
+         "name":"Al Pacino"
+      },
+      "model":"face_matcher.actor",
+      "pk":2
+   }
+]
