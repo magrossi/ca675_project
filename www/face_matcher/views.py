@@ -48,7 +48,7 @@ def matcher(request):
         if form.is_valid():
             img_file = request.FILES['image']
             # todo: set filename from settings
-            img_path = 'test/{}'.format(img_file.name)
+            img_path = 'users/{}/{}'.format(request.user.username, img_file.name)
             try:
                 ImageLibrary.save_image(img_file.read(), img_path)
             except:

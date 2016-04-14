@@ -15,58 +15,36 @@
         <div class="col-lg-8 col-lg-offset-2 text-center">
           <h2 class="section-heading">Face Matcher</h2>
           <hr class="light">
-          <p>Upload your photo and select face:</p>
+          <!--<p>Upload your photo and select face:</p>-->
           <form enctype="multipart/form-data" method="post">
             {% csrf_token %}
             {% for error in form.image.errors %}
               <div class="alert alert-danger" role="alert">{{ error|escape }}</div>
             {% endfor %}
-            {% for error in form.face_bbox.errors %}
+            <!-- {% for error in form.face_bbox.errors %}
               <div class="alert alert-danger" role="alert">{{ error|escape }}</div>
-            {% endfor %}
-            <div class="row">
-              <div class="col-lg-8">
-                <div class="fileinput fileinput-new" data-provides="fileinput">
-                  <div class="fileinput-new thumbnail" style="width: 400px; height: 350px;">
-                    <img src="{% static 'images/placeholder.png' %}" alt="...">
-                  </div>
-                  <div class="fileinput-preview fileinput-exists thumbnail"
-                       style="max-width: 800px; max-height: 600px;"></div>
-
-
+            {% endfor %} -->
+            <div class="fileinput fileinput-new" data-provides="fileinput">
+              <div class="fileinput-new thumbnail" style="width: 400px; height: 350px;">
+                <img src="{% static 'images/placeholder.png' %}" alt="...">
+              </div>
+              <div class="fileinput-preview fileinput-exists thumbnail"
+                   style="max-width: 800px; max-height: 500px;"></div>
+              <div>
+                Compare with:
+                <p>
+                  <label class="radio-inline"><input type="radio" value="all" name="face_source_filter"
+                                                     checked>All</label>
+                  <label class="radio-inline"><input type="radio" value="user" name="face_source_filter">Users</label>
+                  <label class="radio-inline"><input type="radio" value="actor" name="face_source_filter">Actors</label>
+                </p>
               <span class="btn btn-default btn-file">
                 <span class="fileinput-new">Browse image</span>
                 <span class="fileinput-exists">Change</span>
                 <input type="file" name="image">
               </span>
-                  <input type="hidden" name="face_bbox"/>
-                  <input type="submit" class="btn btn-default fileinput-exists"/>
-                </div>
-              </div>
-              <div class="col-lg-4">
-                <div class="well well-sm text-left tooltip-options text-muted">
-                  Compare with:
-                  <div class="btn-group" data-toggle="buttons">
-                    <label class="btn btn-primary active">
-                      <input type="radio" value="all" name="face_source_filter" checked>All
-                    </label>
-                    <label class="btn btn-primary">
-                      <input type="radio" value="user" name="face_source_filter">Users
-                    </label>
-                    <label class="btn btn-primary">
-                      <input type="radio" value="actor" name="face_source_filter">Actors
-                    </label>
-                  </div>
-                  <br>
-                  <br>
-                  Max results: <span class="output"></span>
-                  <p>
-
-                    <input type="text" data-slider="true" value="8" data-slider-range="1,20" data-slider-step="1"
-                           data-slider-snap="true" name="max_results">
-                  </p>
-
-                </div>
+                <input type="hidden" name="face_bbox"/>
+                <input type="submit" class="btn btn-default fileinput-exists"/>
               </div>
             </div>
           </form>
@@ -78,80 +56,64 @@
     <div class="row">
       <div class="col-lg-12">
         <h2 class="text-center">History</h2>
-        {% for h in history %}
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <span>{{ h.created_at }}</span>
-              <span class="label label-success">{{ h.get_status_display }}</span>
-              {% if h.status in 'FE' %}
-                <span>
-                {% with h.historyitem_set.all|first as top_matcher %}
-                  Top matcher:
-                  {% if top_matcher.face.face_source == 'A' %}
-                    Actor <b>{{ top_matcher.face.actor.name }}</b>
-                  {% else %}
-                    User <b>{{ top_matcher.face.user.username }}</b>
-                  {% endif %}
-                  {% multiply_100 top_matcher.similarity_score %}%
-                {% endwith %}
-              </span>
-                <span class="pull-right">Generated: {% calc_time h %} ms</span>
-              {% endif %}
-            </div>
-            <div class="panel-collapse collapse out">
-              <div class="panel-body">
-                <div class="row">
-                  <div class="col-sm-6 col-md-4">
-                    <div class="thumbnail">
-                      <img src="/static/images/{{ h.in_face.face_img_path }}" alt="Main image" class="img-responsive">
-                    </div>
 
+        <ul class="list-group">
+          {% for h in history %}
+            <li class="list-group-item" id="history-{{ h.id }}">
+
+              <div class="row">
+                <div class="col-sm-6 col-md-4">
+                  <div class="thumbnail">
+                    <img src="/static/images/{{ h.in_face.face_img_path }}" alt="Main image" class="img-responsive">
                   </div>
+                  <span>{{ h.created_at }}</span>
+                  <p class="caption">
+                    <span class="label label-success">{{ h.get_status_display }}</span>
+                    {% if h.status == 'P' %}
+                      <!-- <button class="btn btn-xs btn-primary refresh-page" data-id="{{ h.id }}">
+                        <i class="glyphicon glyphicon-refresh"></i> Refresh
+                      </button> -->
+                    {% endif %}
+                  </p>
+                </div>
 
-                  <div class="col-sm-6 col-md-8 row-eq-height row">
-                    {% for hi in h.historyitem_set.all %}
-                      <div class="col-xs-6 col-md-3 history-item">
+                <div class="col-sm-6 col-md-8 row-eq-height row">
+                  {% for hi in h.historyitem_set.all %}
+                    <div class="col-xs-6 col-md-3 history-item">
                     <span class="thumbnail">
                       <img src="/static/images/{{ hi.face.face_img_path }}" class="img-responsive">
                         <div class="progress">
                           <div class="progress-bar progress-bar-info" role="progressbar"
                                aria-valuenow="{% multiply_100 hi.similarity_score %}"
-                               aria-valuemin="0" aria-valuemax="100"
                                style="width:{% multiply_100 hi.similarity_score %}%; color: #f05f40;">
                             {% multiply_100 hi.similarity_score %}%
                           </div>
                         </div>
                     </span>
-                      </div>
-                      {% empty %}
-                      <button class="btn btn-xs btn-primary refresh-page" data-id="{{ h.id }}">
-                        <i class="glyphicon glyphicon-refresh"></i> Refresh
-                      </button>
-                    {% endfor %}
-                  </div>
+                    </div>
+                    {% empty %}
+                    Empty set
+                  {% endfor %}
                 </div>
               </div>
-            </div>
-          </div>
-        {% endfor %}
+            </li>
+            {% empty %}
+            <p>You don't have history yet.</p>
+          {% endfor %}
+        </ul>
       </div>
     </div>
   </div>
-
-  {% footer %}
-
 {% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/css/jasny-bootstrap.min.css">
   <link rel="stylesheet" href="{% static 'css/jquery.Jcrop.min.css' %}" type="text/css"/>
-  <link rel="stylesheet" href="{% static 'css/simple-slider.css' %}" type="text/css"/>
   <link rel="stylesheet" href="{% static 'css/faces.css' %}" type="text/css"/>
 {% endblock %}
 
 {% block extra_js %}
   <script src="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/js/jasny-bootstrap.min.js"></script>
   <script src="{% static 'js/jquery.Jcrop.min.js' %}"></script>
-  <script src="{% static 'js/simple-slider.min.js' %}"></script>
   <script src="{% static 'js/faces.js' %}"></script>
 {% endblock %}

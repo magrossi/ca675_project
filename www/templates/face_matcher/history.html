@@ -17,9 +17,8 @@
         <div class="col-lg-8 col-lg-offset-2 text-center">
           <h2 class="section-heading">History</h2>
           <hr class="light">
-          <p class="text-faded">Your all matching history</p><br><br><br><br>
-
-     </div> 
+          <p class="text-faded">Your all matching history</p>
+        </div>
       </div>
     </div>
   </section>
@@ -81,10 +80,6 @@
                         </div>
                     </span>
                       </div>
-                      {% empty %}
-                      <!-- <button class="btn btn-xs btn-primary refresh-page" data-id="{{ h.id }}"> -->
-                        <!-- <i class="glyphicon glyphicon-refresh"></i> Refresh -->
-                      </button>
                     {% endfor %}
                   </div>
                 </div>
@@ -118,7 +113,7 @@
     </div>
   {% endif %}
 
-{% footer %}
+  {% footer %}
 
 {% endblock %}
 

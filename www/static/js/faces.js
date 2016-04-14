@@ -23,8 +23,7 @@
       onSelect: showCoords,
       bgFade: true,
       bgOpacity: .3,
-      setSelect: [w / 2 - w * 0.2, h / 2 + h * 0.2, w / 2 + w * 0.2, h / 2 - h * 0.2],
-      aspectRatio: 1
+      setSelect: [w/2-w*0.2, h/2+h*0.2, w/2+w*0.2, h/2-h*0.3]
     });
   }
 
@@ -37,16 +36,6 @@
 
   $('.refresh-page').on('click', function () {
     window.location = window.location;
-  });
-
-  // slider
-  $("[data-slider]").bind("slider:ready slider:changed", function (event, data) {
-    $(".output").html(data.value);
-  });
-
-  // spoilers
-  $(".panel-heading").click(function () {
-    $(this).next().collapse('toggle');
   });
 
 })(jQuery); // End of use strict
