@@ -11,7 +11,7 @@ Similar face image finder app built in Python, Django, Postgres and Nginx in a c
 1. Create migrations (from www), `docker-compose run www /usr/local/bin/python manage.py migrate`
 1. Add an admin user (from www), `docker-compose run www /usr/local/bin/python manage.py createsuperuser --username root --email root@root.com`
 1. Seed the database (from www), `docker-compose run www /usr/local/bin/python seed.py`
-1. Create the working model/face dataset files (from wwww), `docker-compose run www /usr/local/bin/python build_datasets.py`
+1. Seed the initial datafiles (from www), `docker exec -it ca675project_celery_1 /usr/local/bin/python seed_datafiles.py`
 1. Grab the IP, `docker-machine ip dev`, and view in your browser
 
 ### Running Tests Locally
@@ -169,6 +169,11 @@ One can provision the application stack to an Ec2 instance through the following
   DB_PASS={{pass}}
   DB_SERVICE={{RDS_endpoint}}
   DB_PORT={{port}}
+  IMG_BASE_S3_ACCESS_KEY={{access_key}}
+  IMG_BASE_S3_SECRET_KEY={{secret-key}}
+  IMG_BASE_S3_BUCKET={{bucket}}
+  IMG_BASE_S3_PREFIX={{prefix}}
+  IMG_BASE_S3_REGION={{region}}
 ```
 
 One can deploy the application through the following steps:

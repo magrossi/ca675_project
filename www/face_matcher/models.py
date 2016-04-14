@@ -1,7 +1,9 @@
-import os, os.path
+import os
+import os.path
+
 from django.db import models
 from django.conf import settings
-
+from lib.helpers import ImageLibrary
 
 class Actor(models.Model):
     MALE = 'M'

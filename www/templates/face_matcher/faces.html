@@ -64,7 +64,7 @@
               <div class="row">
                 <div class="col-sm-6 col-md-4">
                   <div class="thumbnail">
-                    <img src="/static/images/{{ h.in_face.face_img_path }}" alt="Main image" class="img-responsive">
+                    <img src="{{ h.in_face.url }}" alt="Main image" class="img-responsive">
                   </div>
                   <span>{{ h.created_at }}</span>
                   <p class="caption">
@@ -81,7 +81,7 @@
                   {% for hi in h.historyitem_set.all %}
                     <div class="col-xs-6 col-md-3 history-item">
                     <span class="thumbnail">
-                      <img src="/static/images/{{ hi.face.face_img_path }}" class="img-responsive">
+                      <img src="{{ hi.face.url }}" class="img-responsive">
                         <div class="progress">
                           <div class="progress-bar progress-bar-info" role="progressbar"
                                aria-valuenow="{% multiply_100 hi.similarity_score %}"

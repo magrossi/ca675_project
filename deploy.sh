@@ -16,6 +16,11 @@
 #     - DB_PASS={{pass}}                                    #
 #     - DB_SERVICE={{RDS endpoint}}                         #
 #     - DB_PORT={{port}}                                    #
+#     - IMG_BASE_S3_ACCESS_KEY={{access_key}}               #
+#     - IMG_BASE_S3_SECRET_KEY={{secret_key}}               #
+#     - IMG_BASE_S3_BUCKET={{bucket}}                       #
+#     - IMG_BASE_S3_PREFIX={{prefix}}                       #
+#     - IMG_BASE_S3_REGION={{region}}                       #
 #  - Can just provision the machine and build the app       #
 #    - Requires having a precreated VPC                     #
 #    - Requires MACHINE, VPC_ID, REGION and ZONE env params #
@@ -46,7 +51,7 @@ while getopts ":p" opt; do
                                             $NAME && \
         eval $(docker-machine env $NAME) && \
         echo "...machine provisioned";
-        
+
       exit 0
       ;;
     *)

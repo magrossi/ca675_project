@@ -121,28 +121,28 @@ class MetaImageLibrary(type):
 class ImageLibrary():
     __metaclass__ = MetaImageLibrary
 
+    BASE_S3_URL = 'http://{}.s3.amazonaws.com'.format(settings.IMAGE_STORAGE_S3_BUCKET)
+
     _LOCAL_STORAGE = 'local'
     _S3_STORAGE = 's3'
 
     @classmethod
-    def _get_s3bucket(cls):
-        return S3Bucket(settings.IMAGE_STORAGE_S3_BUCKET,
-                        access_key=settings.IMAGE_STORAGE_S3_ACCESS_KEY,
-                        secret_key=settings.IMAGE_STORAGE_S3_SECRET_KEY,
-                        base_url='http://{}.s3.amazonaws.com'.format(settings.IMAGE_STORAGE_S3_BUCKET))
+    def get_image_url(cls, rel_img_path):
+        if settings.IMAGE_STORAGE_MODE == cls._LOCAL_STORAGE:
+            return os.path.join(settings.STATIC_URL, 'images', rel_img_path)
+        return '{}/{}{}'.format(cls.BASE_S3_URL, settings.IMAGE_STORAGE_S3_PREFIX, rel_img_path)
 
     @classmethod
     def save_image(cls, raw_img, rel_img_path):
         if settings.IMAGE_STORAGE_MODE == cls._LOCAL_STORAGE:
-            filename = os.path.join(settings.IMAGE_STORAGE_LOCAL_DIR, rel_img_path)
+            filename = cls.get_image_url(rel_img_path)
             full_dir = os.path.dirname(filename)
             if not os.path.exists(full_dir):
                 os.makedirs(full_dir)
             with open(filename, 'wb') as f:
                 f.write(raw_img)
         else:
-            s3 = cls._get_s3bucket()
-            s3.put(settings.IMAGE_STORAGE_S3_PREFIX + rel_img_path, raw_img)
+            cls._get_s3bucket().put(settings.IMAGE_STORAGE_S3_PREFIX + rel_img_path, raw_img)
 
     @classmethod
     def del_image(cls, rel_img_path):
@@ -177,6 +177,13 @@ class ImageLibrary():
             s3 = cls._get_s3bucket()
             for (key, modify, etag, size) in s3.listdir(prefix=settings.IMAGE_STORAGE_S3_PREFIX):
                 yield os.path.relpath(key, settings.IMAGE_STORAGE_S3_PREFIX)
+
+    @classmethod
+    def _get_s3bucket(cls):
+        return S3Bucket(settings.IMAGE_STORAGE_S3_BUCKET,
+                        access_key=settings.IMAGE_STORAGE_S3_ACCESS_KEY,
+                        secret_key=settings.IMAGE_STORAGE_S3_SECRET_KEY,
+                        base_url=cls.BASE_S3_URL)
 
     @classmethod
     def _pre_process_image(cls, image, bbox):
