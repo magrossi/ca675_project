@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load staticfiles widget_tweaks face_matcher_extras %}
 
-{% block title %}Sign Up{% endblock %}
+{% block title %}Registration{% endblock %}
 
 {% block content %}
   <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
@@ -13,7 +13,7 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-8 col-lg-offset-2 text-center">
-          <h2 class="section-heading">Sign Up</h2>
+          <h2 class="section-heading">Registration</h2>
           <form method="post">
             {% csrf_token %}
             {% for field in form %}

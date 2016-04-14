@@ -10,10 +10,10 @@ wsgiref==0.1.2
 gunicorn==19.3.0
 psycopg2==2.6
 mrjob==0.5.0
-simples3==1.0
 redis==2.10.5
 celery[redis]==3.1.23
 numpy==1.11.0
 scipy==0.17.0
 scikit-learn==0.17.1
 django-widget-tweaks==1.4.1
+https://github.com/lericson/simples3/zipball/master

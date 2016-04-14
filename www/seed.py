@@ -1,30 +1,35 @@
-import os, os.path, csv, django
+import os
+import os.path
+import csv
+import django
+
 from django.conf import settings
-from lib.helpers import ImageLibrary
-from sets import Set
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'web.settings')
 django.setup()
 
+from lib.helpers import ImageLibrary
+from django.contrib.auth.models import User
 from face_matcher.models import Face, Actor
 
-facescrub_dataset_file = 'facescrub_dataset.txt'
+# Clean Actor and Face tables
+Face.objects.all().delete()
+Actor.objects.all().delete()
 
-# Read facescrub_dataset.txt
-# Format: 'id', 'name', 'gender', 'url', 'bbox', 'sha256', 'relative_img_path'
+facescrub_dataset_file = 'facescrub_dataset.txt'
 
 actor_ct = 0
 faces_ct = 0
 users_ct = 0
 
-# To build Face and Actors based on the existance of the image file
+# Build Face and Actors based on the existance of the image file
 with open(facescrub_dataset_file, 'rb') as dset:
     reader = csv.reader(dset, dialect='excel')
     next(reader, None)  # skip the headers
 
     # Create new Actors/Faces based on existing image files
     # First obtain a listing of all existing images (especially usefull when using S3)
-    filenames = Set(list(ImageLibrary.list_all()))
+    filenames = set(list(ImageLibrary.list_all()))
 
     actor = None # Actors are in order in the dataset so can leverage it
     for id, name, gender, url, bbox, sha256, relative_img_path in reader:
@@ -55,21 +60,18 @@ with connection.cursor() as c:
     c.execute('SELECT setval(\'face_matcher_face_id_seq\', 120000, FALSE);')
 
 # Create a demo user with demo picture
-from django.contrib.auth.models import User
-
-user = User.objects.create_user('demo', 'demo@demo.com', 'demo')
-user.save()
-users_ct += 1
-
-face = Face.objects.create(url = '/media/dog.png',
-                           user = user,
-                           actor = None,
-                           face_bbox = '0,0,100,100',
-                           face_img_path = 'dog.png')
-
-user.face_set.add(face)
-user.save()
-faces_ct += 1
+if not User.objects.filter(username='demo').exists():
+    user = User.objects.create_user('demo', 'demo@demo.com', 'demo')
+    user.save()
+    users_ct += 1
+    face = Face.objects.create(url = '/media/dog.png',
+                               user = user,
+                               actor = None,
+                               face_bbox = '0,0,100,100',
+                               face_img_path = 'dog.png')
+    user.face_set.add(face)
+    user.save()
+    faces_ct += 1
 
 print ""
 print "Seed Summary:"

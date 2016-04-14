@@ -1,6 +1,9 @@
+import uuid
+from os.path import splitext
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
-from .forms import ImageUploadForm, FmUserCreationForm
+from .forms import ImageUploadForm, RegistrationForm
 from .models import History, Face
 from .tasks import find_similars
 from .templatetags.face_matcher_extras import calc_time, multiply_100, status_label_class
@@ -23,7 +26,7 @@ def index(request):
 def registration(request):
     form = None
     if request.method == 'POST':
-        form = FmUserCreationForm(request.POST)
+        form = RegistrationForm(request.POST)
         if form.is_valid():
             form.save()
             user = authenticate(
@@ -34,7 +37,7 @@ def registration(request):
             return redirect(settings.LOGIN_REDIRECT_URL)
 
     context_dict = {
-        'form': form and form or FmUserCreationForm(),
+        'form': form and form or RegistrationForm(),
     }
     return render(request, 'face_matcher/registration.html', context_dict)
 
@@ -42,25 +45,27 @@ def registration(request):
 @login_required
 def matcher(request):
     form = None
+    user = request.user
+
     if request.method == 'POST':
         form = ImageUploadForm(request.POST, request.FILES)
 
         if form.is_valid():
             img_file = request.FILES['image']
-            # todo: set filename from settings
-            img_path = 'users/{}/{}'.format(request.user.username, img_file.name)
+            _, img_extension = splitext(img_file.name)
+            rel_img_path = 'user/{}/{}{}'.format(user.id, uuid.uuid1().hex, img_extension)
             try:
-                ImageLibrary.save_image(img_file.read(), img_path)
+                ImageLibrary.save_image(img_file.read(), rel_img_path)
             except:
                 raise  # todo: handle save exception
             face_bbox = form.cleaned_data['face_bbox']
             face = Face.objects.create(
-                user=request.user,
-                url='http://google.com/',  # todo: fixme
+                user=user,
+                url=ImageLibrary.get_image_url(rel_img_path),
                 face_bbox=face_bbox,
-                face_img_path=img_path,
+                face_img_path=rel_img_path,
             )
-            history = History.objects.create(user=request.user, in_face=face)
+            history = History.objects.create(user=user, in_face=face)
 
             face_source_filter = form.cleaned_data['face_source_filter']
             max_results = form.cleaned_data['max_results']
@@ -101,7 +106,7 @@ def history(request):
 
 @login_required
 @csrf_exempt
-def ajax_get_history(request, id):
+def get_json_histroy(request, id):
     history = History.objects.get(user=request.user, pk=id)
 
     result_dict = {

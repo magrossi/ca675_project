@@ -31,9 +31,9 @@ class ImageUploadForm(forms.Form):
         return data
 
 
-class FmUserCreationForm(UserCreationForm):
+class RegistrationForm(UserCreationForm):
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         if len(password1.strip()) < settings.MIN_PASSWORD_LENGTH:
             raise forms.ValidationError(_("Password too short."), code='password_not_valid')
-        return super(FmUserCreationForm, self).clean_password2()
+        return super(RegistrationForm, self).clean_password2()
