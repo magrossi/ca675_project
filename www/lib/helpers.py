@@ -1,11 +1,11 @@
 from PIL import Image, ImageOps
-from sklearn.decomposition import RandomizedPCA
+from sklearn.decomposition import RandomizedPCA, IncrementalPCA
 from sklearn.externals import joblib
 from django.conf import settings
 from simples3 import S3Bucket
 from StringIO import StringIO
-import os, os.path, numpy as np
-import redis
+from itertools import chain, islice
+import os, os.path, redis, numpy as np
 
 class MetaModelBuilder(type):
     @property
@@ -28,6 +28,19 @@ class ModelBuilder():
         pca.fit(dataset)
         eigenfaces = pca.transform(dataset)
         return (pca, eigenfaces)
+
+    @classmethod
+    def build_from_iter(cls, data_gen, chunk_size):
+        pca = IncrementalPCA(n_components=ImageLibrary.components)
+        for chunk in cls._chunks(data_gen, size=chunk_size):
+            data = cls._array_from_iter(chunk, dtype=np.uint8)
+            pca.partial_fit(data)
+        return pca
+
+    @classmethod
+    def apply_from_iter(cls, model, img_data_gen):
+        for img_data in img_data_gen:
+            yield model.transform([img_data])[0]
 
     @classmethod
     def apply(cls, img_data):
@@ -77,6 +90,24 @@ class ModelBuilder():
     @classmethod
     def str_to_eigenface(cls, eigenstr):
         return np.asarray(map(float, eigenstr.split()))
+
+    @classmethod
+    def _chunks(cls, iterable, size=10):
+        iterator = iter(iterable)
+        for first in iterator:
+            yield chain([first], islice(iterator, size - 1))
+
+    @classmethod
+    def _array_from_iter(cls, it, dtype=None):
+        try:
+            ans = np.array([it.next()], dtype=dtype)
+        except StopIteration:
+            raise ValueError('iterator contains 0 items')
+        shape0 = ans.shape[1:]
+        for (i, x) in enumerate(it):
+            ans.resize((i+2,)+shape0)
+            ans[i+1] = x
+        return ans
 
 class MetaImageLibrary(type):
     @property

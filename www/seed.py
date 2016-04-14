@@ -37,7 +37,8 @@ with open(facescrub_dataset_file, 'rb') as dset:
                 actor_ct += 1
 
             # Create the new face
-            face = Face.objects.create(url = url,
+            face = Face.objects.create(id = id,
+                                       url = url,
                                        user = None,
                                        actor = actor,
                                        face_bbox = bbox,
@@ -47,6 +48,11 @@ with open(facescrub_dataset_file, 'rb') as dset:
 
             if (settings.FACEREC_MAX_SEED_IMG > 0 and faces_ct >= settings.FACEREC_MAX_SEED_IMG):
                 break
+
+# Start the face id sequence from 120,000 reserving the previous ids for Actors
+from django.db import connection
+with connection.cursor() as c:
+    c.execute('SELECT setval(\'face_matcher_face_id_seq\', 120000, FALSE);')
 
 # Create a demo user with demo picture
 from django.contrib.auth.models import User
