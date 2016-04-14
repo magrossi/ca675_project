@@ -33,20 +33,24 @@
     $("input[name='face_bbox']").val(coords.join());
   }
 
-  // refresh if pending
-
-  $('.refresh-page').on('click', function () {
-    window.location = window.location;
-  });
 
   // slider
-  $("[data-slider]").bind("slider:ready slider:changed", function (event, data) {
+
+  var $dataSlider = $("[data-slider]");
+  $dataSlider.bind("slider:ready", function (event, data) {
+    var $tooltipOptions = $('.tooltip-options');
+    $tooltipOptions.css('display', 'none');
+    $tooltipOptions.css('visibility', 'visible');
+  });
+
+  $dataSlider.bind("slider:changed slider:ready", function (event, data) {
     $(".output").html(data.value);
   });
 
-  // spoilers
-  $(".panel-heading").click(function () {
-    $(this).next().collapse('toggle');
+  // options
+  $('.settings-gear').on('click', function () {
+    $('.tooltip-options').fadeToggle();
   });
+
 
 })(jQuery); // End of use strict

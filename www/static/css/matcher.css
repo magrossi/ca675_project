@@ -1,26 +1,20 @@
-.row-eq-height {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.progress {
-    margin: 5px 0 0 0;
-}
-
-.history-item img {
-    max-height: 150px;
+.tooltip-options {
+    visibility: hidden;
 }
 
 @media (min-width: 1200px) {
+
+    .tooltip-options {
+        position: absolute;
+        right: -6%;
+        top: 68%;
+    }
+
     .tooltip-options:after {
         content: '';
         position: absolute;
-        top: 40%;
-        right: 94%;
-        margin-top: -52px;
+        top: 8%;
+        right: 99%;
         width: 0;
         height: 0;
         border-right: 20px solid #f5f5f5;
@@ -62,4 +56,19 @@
 
 .fileinput .btn.btn-file {
     margin: 10px;
+}
+
+.settings-gear {
+    cursor: pointer;
+    position: relative;
+    top: 4px;
+}
+
+.search-buttons .active {
+    border-color: #f05f40;
+    color: #fff;
+    background-color: #f05f40;
+    -webkit-transition: all .35s;
+    -moz-transition: all .35s;
+    transition: all .35s;
 }

@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load staticfiles widget_tweaks face_matcher_extras %}
+
+{% block title %}History{% endblock %}
+
+{% block content %}
+
+  <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+      {% header %}
+    </div>
+  </nav>
+
+  <section class="bg-primary" id="about">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 text-center">
+          <h2 class="section-heading">History</h2>
+          <hr class="light">
+          <p class="text-faded">Your all matching history</p><br><br><br><br>
+
+     </div> 
+      </div>
+    </div>
+  </section>
+
+  <div class="container" id="top-page">
+    <div class="row">
+      <div class="col-lg-12">
+        <p></p>
+        {% for h in history %}
+          <div class="panel panel-default{% if h.status not in 'FE' %} pending{% endif %}" data-history-id="{{ h.id }}">
+            <div class="panel-heading accordion-toggle">
+              <div class="row">
+
+                <div class="created col-lg-3 col-md-4">{{ h.created_at }}</div>
+                <div class="col-md-1 status-label">
+                  <span class="label label-{% status_label_class h.status %}">{{ h.get_status_display }}</span>
+                </div>
+                <div class="info-container col-md-7 col-lg-8">
+
+                  {% if h.status in 'FE' %}
+                    <span>
+                {% with h.historyitem_set.all|first as top_matcher %}
+                  Top matcher:
+                  {% if top_matcher.face.face_source == 'A' %}
+                    Actor <b>{{ top_matcher.face.actor.name }}</b>
+                  {% else %}
+                    User <b>{{ top_matcher.face.user.username }}</b>
+                  {% endif %}
+                  {% multiply_100 top_matcher.similarity_score %}%
+                {% endwith %}
+              </span>
+                    <span class="pull-right">Generated: {% calc_time h %}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="panel-collapse collapse out">
+              <div class="panel-body">
+                <div class="row">
+                  <div class="col-sm-6 col-md-4">
+                    <div class="thumbnail">
+                      <img src="/static/images/{{ h.in_face.face_img_path }}" alt="Main image" class="img-responsive">
+                    </div>
+
+                  </div>
+
+                  <div class="col-sm-6 col-md-8 row-eq-height row items-container">
+                    {% for hi in h.historyitem_set.all %}
+                      <div class="col-xs-6 col-md-3 history-item">
+                    <span class="thumbnail">
+                      <img src="/static/images/{{ hi.face.face_img_path }}" class="img-responsive">
+                        <div class="progress">
+                          <div class="progress-bar progress-bar-info" role="progressbar"
+                               aria-valuenow="{% multiply_100 hi.similarity_score %}"
+                               aria-valuemin="0" aria-valuemax="100"
+                               style="width:{% multiply_100 hi.similarity_score %}%;">
+                            {% multiply_100 hi.similarity_score %}%
+                          </div>
+                        </div>
+                    </span>
+                      </div>
+                      {% empty %}
+                      <!-- <button class="btn btn-xs btn-primary refresh-page" data-id="{{ h.id }}"> -->
+                        <!-- <i class="glyphicon glyphicon-refresh"></i> Refresh -->
+                      </button>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <p>You don’t have a history yet</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {% if history.paginator.num_pages > 1 %}
+    <div class="container text-center">
+      <ul class="pagination pagination-centered">
+        {% if history.has_previous %}
+          <li><a href="?page=1"><<</a></li>
+          <li><a href="?page={{ history.previous_page_number }}"><</a></li>
+        {% endif %}
+
+        {% for i in history.paginator.page_range %}
+          <li {% if history.number == i %} class="active" {% endif %}><a href="?page={{ i }}">{{ i }}</a></li>
+        {% endfor %}
+
+        {% if history.has_next %}
+          <li><a href="?page={{ history.next_page_number }}">></a></li>
+          <li><a href="?page={{ history.paginator.num_pages }}">>></a></li>
+        {% endif %}
+      </ul>
+    </div>
+  {% endif %}
+
+{% footer %}
+
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/history.css' %}" type="text/css"/>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/history.js' %}"></script>
+{% endblock %}

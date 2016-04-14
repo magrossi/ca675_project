@@ -1,10 +1,16 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .forms import ImageUploadForm
+from django.contrib.auth.forms import AuthenticationForm
+from .forms import ImageUploadForm, FmUserCreationForm
 from .models import History, Face
 from .tasks import find_similars
+from .templatetags.face_matcher_extras import calc_time, multiply_100, status_label_class
 from lib.helpers import ImageLibrary
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
+from django.conf import settings
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
 
 def index(request):
@@ -17,19 +23,24 @@ def index(request):
 def registration(request):
     form = None
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = FmUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('/')
+            user = authenticate(
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password1']
+            )
+            login(request, user)
+            return redirect(settings.LOGIN_REDIRECT_URL)
 
     context_dict = {
-        'form': form and form or UserCreationForm(),
+        'form': form and form or FmUserCreationForm(),
     }
     return render(request, 'face_matcher/registration.html', context_dict)
 
 
 @login_required
-def faces(request):
+def matcher(request):
     form = None
     if request.method == 'POST':
         form = ImageUploadForm(request.POST, request.FILES)
@@ -52,10 +63,72 @@ def faces(request):
             history = History.objects.create(user=request.user, in_face=face)
 
             face_source_filter = form.cleaned_data['face_source_filter']
-            find_similars.delay(history.id, face_source_filter=face_source_filter)
+            max_results = form.cleaned_data['max_results']
+
+            find_similars.delay(
+                history.id,
+                face_source_filter=face_source_filter,
+                max_results=max_results,
+            )
+
+            return redirect('/history/')
 
     context_dict = {
-        'form': form and form or ImageUploadForm(),
-        'history': History.objects.filter(user=request.user)
+        'form': form and form or ImageUploadForm()
     }
-    return render(request, 'face_matcher/faces.html', context_dict)
+    return render(request, 'face_matcher/matcher.html', context_dict)
+
+
+@login_required
+def history(request):
+    history_list = History.objects.filter(user=request.user)
+    paginator = Paginator(history_list, 10)  # Show 10 items per page
+
+    page = request.GET.get('page')
+
+    try:
+        history = paginator.page(page)
+    except PageNotAnInteger:
+        history = paginator.page(1)
+    except EmptyPage:
+        history = paginator.page(paginator.num_pages)
+
+    context_dict = {
+        'history': history
+    }
+    return render(request, 'face_matcher/history.html', context_dict)
+
+
+@login_required
+@csrf_exempt
+def ajax_get_history(request, id):
+    history = History.objects.get(user=request.user, pk=id)
+
+    result_dict = {
+        'status': history.status,
+        'status_label_class': status_label_class(history.status),
+    }
+
+    if history.status not in 'FE':
+        return JsonResponse(result_dict)
+
+    top_matcher = history.historyitem_set.all()[0]
+    top_matcher_face = top_matcher.face
+    top_matcher_name = top_matcher_face.face_source == 'A' and top_matcher_face.actor.name \
+                       or top_matcher_face.user.username
+
+    result_dict['generated'] = calc_time(history)
+    result_dict['status_string'] = history.get_status_display()
+    result_dict['top_matcher_source'] = top_matcher_face.face_source
+    result_dict['top_matcher_name'] = top_matcher_name
+    result_dict['top_matcher_similarity_score'] = multiply_100(top_matcher.similarity_score)
+    result_dict['history_items'] = []
+
+    for history_item in history.historyitem_set.all():
+        result_dict['history_items'].append(
+            {
+                'similarity_score': multiply_100(history_item.similarity_score),
+                'image': history_item.face.face_img_path,
+            }
+        )
+    return JsonResponse(result_dict)

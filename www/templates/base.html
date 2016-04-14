@@ -8,7 +8,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
   <meta name="author" content="">
-  <title>CA675 Project</title>
+  <title>{% block title %}CA675 Project{% endblock %}</title>
+  <link rel=icon href="{% static 'images/favicon.ico' %}">
+  <!--[if IE]><link rel="shortcut icon" href="{% static 'images/favicon.ico' %}"><![endif]-->
   <!-- Bootstrap Core CSS -->
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type="text/css">
   <!-- Custom Fonts -->
