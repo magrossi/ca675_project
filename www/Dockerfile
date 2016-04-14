@@ -39,41 +39,14 @@ RUN set -ex \
 RUN pip install --no-cache-dir virtualenv
 
 ### App
-
-### Similar faces model configuration
-ENV FACEREC_WIDTH 100
-ENV FACEREC_HEIGHT 100
-ENV FACEREC_COMPONENTS 150
-ENV FACEREC_MAX_SEED_IMG 1000
-
-### Directories
+## Directories
 ENV WORKDIR /usr/src/app
 
 RUN mkdir -p $WORKDIR
 WORKDIR $WORKDIR
 VOLUME $WORKDIR
 
-### Face image location (s3 or local)
-### Assign either IMG_BASE_DIR for local or IMG_BASE_S3_* for s3
-### If both assigned, will use local
-
-# Local
-ENV IMG_BASE_DIR $WORKDIR/static/images
-
-# S3
-# ENV IMG_BASE_S3_ACCESS_KEY <your access key>
-# ENV IMG_BASE_S3_SECRET_KEY <your secret key>
-# ENV IMG_BASE_S3_BUCKET <your bucket>
-# ENV IMG_BASE_S3_PREFIX faces/
-# ENV IMG_BASE_S3_REGION eu-west-1
-
-### Requirements
+## Requirements
 COPY requirements.txt $WORKDIR
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . $WORKDIR
-
-### Remote static facescrub_dataset file
-### Fetch datasets from Google Drive (disabled for now - not needed at the moment)
-# ENV FACESCRUB_DRIVE_ID 0Bzt4aP7vYnOTYXpodUFmMlY4WVU
-# ADD https://googledrive.com/host/$FACESCRUB_DRIVE_ID/facescrub_dataset.tar.gz $WORKDIR/
-# ADD https://googledrive.com/host/$FACESCRUB_DRIVE_ID/seed_images.tar.gz $IMG_BASE_DIR/

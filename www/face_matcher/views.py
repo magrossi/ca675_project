@@ -1,3 +1,6 @@
+import uuid
+from os.path import splitext
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .forms import ImageUploadForm
@@ -31,21 +34,20 @@ def registration(request):
 @login_required
 def faces(request):
     form = None
+    user = request.user
+
     if request.method == 'POST':
         form = ImageUploadForm(request.POST, request.FILES)
 
         if form.is_valid():
             img_file = request.FILES['image']
-            # todo: set filename from settings
-            img_path = 'test/{}'.format(img_file.name)
-            try:
-                ImageLibrary.save_image(img_file.read(), img_path)
-            except:
-                raise  # todo: handle save exception
+            _, img_extension = splitext(img_file.name)
+            img_path = 'user/{}/{}{}'.format(user.id, uuid.uuid1().hex, img_extension)
+            ImageLibrary.save_image(img_file.read(), img_path)
             face_bbox = form.cleaned_data['face_bbox']
             face = Face.objects.create(
+                url=ImageLibrary.get_image_url(img_path),
                 user=request.user,
-                url='http://google.com/',  # todo: fixme
                 face_bbox=face_bbox,
                 face_img_path=img_path,
             )
