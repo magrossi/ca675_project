@@ -9,7 +9,7 @@ class ImageUploadForm(forms.Form):
     face_source_filter = forms.CharField()
     max_results = forms.CharField()
     face_bbox = forms.CharField(
-        error_messages={'required': 'Please select/crop your face on photo.',}
+        error_messages={'required': 'Please select/crop your face on photo.'}
     )
 
     def clean_face_bbox(self):

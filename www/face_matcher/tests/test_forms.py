@@ -19,7 +19,8 @@ class FormsTestCase(TestCase):
         self.file_only_form = self._build_form()
         self.empty_form = ImageUploadForm()
         self.form = self._build_form(face_bbox=[1, 2, 3, 4],
-                                     face_source_filter='all')
+                                     face_source_filter='all',
+                                     max_results=8)
 
     def test_init(self):
         self.assertIsInstance(self.file_only_form, ImageUploadForm)
@@ -33,9 +34,11 @@ class FormsTestCase(TestCase):
         self.assertFalse(self.file_only_form.is_valid())
         self.assertEqual(self.file_only_form.errors, {
             'face_bbox': ['Please select/crop your face on photo.'],
-            'face_source_filter': ['This field is required.']
+            'face_source_filter': ['This field is required.'],
+            'max_results': [u'This field is required.'],
         })
-        self.assertEqual(self._build_form(face_bbox=[1, 2, 3, 4]).errors, {
+        self.assertEqual(self._build_form(face_bbox=[1, 2, 3, 4],
+                                          max_results=8).errors, {
             'face_source_filter': ['This field is required.']
         })
 

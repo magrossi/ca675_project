@@ -119,8 +119,8 @@ def get_json_histroy(request, id):
 
     top_matcher = history.historyitem_set.all()[0]
     top_matcher_face = top_matcher.face
-    top_matcher_name = top_matcher_face.face_source == 'A' and top_matcher_face.actor.name \
-                       or top_matcher_face.user.username
+    top_matcher_name = (top_matcher_face.face_source == 'A' and top_matcher_face.actor.name
+                                                            or top_matcher_face.user.username)
 
     result_dict['generated'] = calc_time(history)
     result_dict['status_string'] = history.get_status_display()

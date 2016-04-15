@@ -21,15 +21,14 @@ class ViewTestCase(TestCase):
     def _assert_on_root_page(self, response, is_authenticated=True):
         postiveAssertFn = self.assertContains if is_authenticated else self.assertNotContains
         negativeAssertFn = self.assertNotContains if is_authenticated else self.assertContains
-        negativeAssertFn(response, 'Log in')
-        negativeAssertFn(response, 'Sign up')
+        negativeAssertFn(response, 'Log In')
+        negativeAssertFn(response, 'Sign Up')
         postiveAssertFn(response, 'Upload your image')
-        postiveAssertFn(response, self.user.username)
-        postiveAssertFn(response, 'Log Out')
+        postiveAssertFn(response, 'fa-sign-out')
 
     def _assert_on_login_page(self, response):
         self.assertContains(response, 'Log In')
-        self.assertContains(response, 'LogIn')
+        self.assertContains(response, 'Sign Up')
         self.assertContains(response, 'Sign In')
 
     def _assert_on_registration_page(self, response):
@@ -37,10 +36,9 @@ class ViewTestCase(TestCase):
         self.assertContains(response, 'Registration')
         self.assertContains(response, 'Register')
 
-    def _assert_on_faces_page(self, response):
-        self.assertContains(response, self.user.username)
-        self.assertContains(response, 'Log Out')
-        self.assertContains(response, 'Face Matcher')
+    def _assert_on_matcher_page(self, response):
+        self.assertContains(response, 'Upload your photo')
+        self.assertContains(response, 'fa-sign-out')
         self.assertContains(response, 'History')
 
 
@@ -81,7 +79,7 @@ class LoginViewTestCase(ViewTestCase):
 
     def test_valid_login(self):
         response = self.client.post(self.login_route, self.valid_data, follow=True)
-        self._assert_on_root_page(response)
+        self._assert_on_matcher_page(response)
 
 
 class RegistrationViewTestCase(ViewTestCase):
@@ -122,19 +120,19 @@ class RegistrationViewTestCase(ViewTestCase):
 
     def test_valid_registration(self):
         response = self.client.post(self.reg_route, self.valid_data, follow=True)
-        self._assert_on_root_page(response, False)
+        self._assert_on_matcher_page(response)
 
 
-class FacesViewTestCase(ViewTestCase):
+class MatcherViewTestCase(ViewTestCase):
     def setUp(self):
-        super(FacesViewTestCase, self).setUp()
-        self.faces_route = '/faces/'
+        super(MatcherViewTestCase, self).setUp()
+        self.matcher_route = '/matcher/'
         self._login_user()
 
-    def test_faces_index(self):
-        self._assert_on_faces_page(self.client.get(self.faces_route))
+    def test_matcher_index(self):
+        self._assert_on_matcher_page(self.client.get(self.matcher_route))
 
     def test_empty_upload(self):
-        response = self.client.post(self.faces_route, {})
-        self._assert_on_faces_page(response)
+        response = self.client.post(self.matcher_route, {})
+        self._assert_on_matcher_page(response)
         self.assertContains(response, 'This field is required')
