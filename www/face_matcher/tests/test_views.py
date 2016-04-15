@@ -25,6 +25,7 @@ class ViewTestCase(TestCase):
         negativeAssertFn(response, 'Sign up')
         postiveAssertFn(response, 'Upload your image')
         postiveAssertFn(response, self.user.username)
+        postiveAssertFn(response, 'Log Out')
 
     def _assert_on_login_page(self, response):
         self.assertContains(response, 'Log In')
@@ -35,6 +36,12 @@ class ViewTestCase(TestCase):
         self.assertContains(response, 'Log In')
         self.assertContains(response, 'Registration')
         self.assertContains(response, 'Register')
+
+    def _assert_on_faces_page(self, response):
+        self.assertContains(response, self.user.username)
+        self.assertContains(response, 'Log Out')
+        self.assertContains(response, 'Face Matcher')
+        self.assertContains(response, 'History')
 
 
 class IndexViewTestCase(ViewTestCase):
@@ -116,3 +123,18 @@ class RegistrationViewTestCase(ViewTestCase):
     def test_valid_registration(self):
         response = self.client.post(self.reg_route, self.valid_data, follow=True)
         self._assert_on_root_page(response, False)
+
+
+class FacesViewTestCase(ViewTestCase):
+    def setUp(self):
+        super(FacesViewTestCase, self).setUp()
+        self.faces_route = '/faces/'
+        self._login_user()
+
+    def test_faces_index(self):
+        self._assert_on_faces_page(self.client.get(self.faces_route))
+
+    def test_empty_upload(self):
+        response = self.client.post(self.faces_route, {})
+        self._assert_on_faces_page(response)
+        self.assertContains(response, 'This field is required')
