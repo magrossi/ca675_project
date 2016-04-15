@@ -2,7 +2,7 @@ from django.test import TestCase
 from lib.helpers import ImageLibrary
 
 
-class StorageTests(TestCase):
+class ImageLibraryTestCase(TestCase):
     def setUp(self):
         self.sample_img_path = 'dog.png'
         self.sample_temp_file = 'please_delete_me.txt'
