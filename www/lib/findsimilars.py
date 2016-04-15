@@ -52,7 +52,14 @@ class FindSimilars():
         job = FindSimilarsMapReduce(opt)
         try:
             with job.make_runner() as runner:
-                runner.run()
+
+                # distributed reader writer lock
+                # in theory if using emr or hadoop run modes we
+                # don't need to lock the file for the duration of the search
+                # as the file is copied to hdfs
+                with ModelBuilder.lock_dataset_for_read():
+                    runner.run()
+
                 for line in runner.stream_output():
                     face_id, similarity_score = job.parse_output_line(line)
                     history.historyitem_set.create(face=Face.objects.get(pk=face_id), similarity_score = similarity_score)

@@ -5,6 +5,7 @@ from django.conf import settings
 from simples3 import S3Bucket
 from StringIO import StringIO
 from itertools import chain, islice
+from lock import RedisReaderLock, RedisWriterLock
 import os, os.path, redis, numpy as np
 
 class MetaModelBuilder(type):
@@ -49,12 +50,12 @@ class ModelBuilder():
 
     @classmethod
     def dump(cls, model):
-        with redis.Redis(settings.REDIS_HOST).lock(cls.model_filename):
+        with RedisWriterLock(cls._get_redis(), cls.model_filename):
             joblib.dump(model, cls.model_filename, compress=3)
 
     @classmethod
     def load(cls):
-        with redis.Redis(settings.REDIS_HOST).lock(cls.model_filename):
+        with RedisReaderLock(cls._get_redis(), cls.model_filename):
             return joblib.load(cls.model_filename)
 
     @classmethod
@@ -66,10 +67,14 @@ class ModelBuilder():
         return joblib.load(filename)
 
     @classmethod
+    def lock_dataset_for_read(cls):
+        return RedisReaderLock(cls._get_redis(), cls.dataset_filename)
+
+    @classmethod
     def dump_dataset(cls, eigenfaces, data_labels):
         # create and save the dataset of eigenfaces by projecting the processed
         # image data into an orthogonal plane using the fitted model
-        with redis.Redis(settings.REDIS_HOST).lock(cls.dataset_filename):
+        with RedisWriterLock(cls._get_redis(), cls.dataset_filename):
             with open(cls.dataset_filename, 'wb') as f:
                 for index, eigenface in enumerate(eigenfaces):
                     face_id, face_source = data_labels[index]
@@ -78,7 +83,7 @@ class ModelBuilder():
     @classmethod
     def append_dataset(cls, eigenface, data_label):
         # append to the existing dataset the eigenface and associated data_label
-        with redis.Redis(settings.REDIS_HOST).lock(cls.dataset_filename):
+        with RedisWriterLock(cls._get_redis(), cls.dataset_filename):
             with open(cls.dataset_filename, 'a') as f:
                 face_id, face_source = data_label
                 f.write('"{}","{}","{}"\n'.format(face_id, face_source, cls.eigenface_to_str(eigenface)))
@@ -108,6 +113,10 @@ class ModelBuilder():
             ans.resize((i+2,)+shape0)
             ans[i+1] = x
         return ans
+
+    @classmethod
+    def _get_redis(cls):
+        return redis.Redis(settings.REDIS_HOST)
 
 class MetaImageLibrary(type):
     @property
