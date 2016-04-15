@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load staticfiles widget_tweaks face_matcher_extras %}
+
+{% block title %}Match Me{% endblock %}
+
+
+{% block content %}
+
+  <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+      {% header %}
+    </div>
+  </nav>
+
+  <section class="bg-primary" id="about">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 text-center">
+          <h2 class="section-heading">Face Matcher</h2>
+          <hr class="light">
+          <p>Upload your photo and select face:</p>
+          <form enctype="multipart/form-data" method="post">
+            {% csrf_token %}
+            {% for error in form.image.errors %}
+              <div class="alert alert-danger" role="alert">{{ error|escape }}</div>
+            {% endfor %}
+            {% for error in form.face_bbox.errors %}
+              <div class="alert alert-danger" role="alert">{{ error|escape }}</div>
+            {% endfor %}
+
+
+                <div class="fileinput fileinput-new" data-provides="fileinput">
+                  <div class="fileinput-new thumbnail" style="width: 400px; height: 350px;">
+                    <img src="{% static 'images/placeholder.png' %}" alt="...">
+                  </div>
+                  <div class="fileinput-preview fileinput-exists thumbnail"
+                       style="max-width: 800px; max-height: 600px;"></div>
+
+                  <br>
+              <span class="btn btn-default btn-file">
+                <span class="fileinput-new">Browse image</span>
+                <span class="fileinput-exists">Change</span>
+                <input type="file" name="image"  accept="image/jpg,image/jpeg,image/gif,image/png">
+              </span>
+                  <input type="hidden" name="face_bbox"/>
+                  <input type="submit" value="Match Me" class="btn btn-default fileinput-exists"/>
+                  <i class="glyphicon glyphicon-cog fa-lg settings-gear"></i>
+                </div>
+
+                <div class="well well-sm text-left tooltip-options text-muted">
+                  Compare with:
+                  <div class="btn-group search-buttons" data-toggle="buttons">
+                    <label class="btn btn-default active">
+                      <input type="radio" value="all" name="face_source_filter" checked>All
+                    </label>
+                    <label class="btn btn-default">
+                      <input type="radio" value="user" name="face_source_filter">Users
+                    </label>
+                    <label class="btn btn-default">
+                      <input type="radio" value="actor" name="face_source_filter">Actors
+                    </label>
+                  </div>
+                  <br>
+                  <br>
+                  Max results: <span class="output"></span>
+                  <p>
+
+                    <input type="text" data-slider="true" value="8" data-slider-range="1,20" data-slider-step="1"
+                           data-slider-snap="true" name="max_results">
+                  </p>
+
+                </div>
+
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  {% footer %}
+
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/css/jasny-bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'css/jquery.Jcrop.min.css' %}" type="text/css"/>
+  <link rel="stylesheet" href="{% static 'css/simple-slider.css' %}" type="text/css"/>
+  <link rel="stylesheet" href="{% static 'css/matcher.css' %}" type="text/css"/>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/js/jasny-bootstrap.min.js"></script>
+  <script src="{% static 'js/jquery.Jcrop.min.js' %}"></script>
+  <script src="{% static 'js/simple-slider.min.js' %}"></script>
+  <script src="{% static 'js/matcher.js' %}"></script>
+{% endblock %}

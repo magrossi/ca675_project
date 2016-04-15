@@ -8,31 +8,38 @@
   </button>
   <a class="navbar-brand page-scroll" href="{{ prefix }}#page-top">CA675 Project</a>
 </div>
-<!-- Collect the nav links, forms, and other content for toggling -->
+
 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
   <ul class="nav navbar-nav navbar-right">
-    <li>
-      <a class="page-scroll" href="{{ prefix }}#about">About</a>
-    </li>
-
     {% if user.is_authenticated %}
       <li>
-        <a class="page-scroll" href="{% url 'face_matcher:faces' %}">{{ user.username }}</a>
+        <a class="page-scroll" href="{% url 'face_matcher:matcher' %}">Match Me</a>
       </li>
       <li>
-      <a class="page-scroll" href="{{ prefix }}#contact">Contact</a>
-      </li>
-      <li>
-        <a class="page-scroll" href="{% url 'logout' %}">Log Out</a>
+        <a class="page-scroll" href="{% url 'face_matcher:history' %}">History</a>
       </li>
     {% else %}
       <li>
         <a class="page-scroll" href="{{ prefix }}#user">Log In</a>
       </li>
       <li>
-      <a class="page-scroll" href="{{ prefix }}#contact">Contact</a>
+        <a class="page-scroll" href="{% url 'face_matcher:registration' %}">Sign Up</a>
       </li>
     {% endif %}
 
+    {% if prefix == ' ' %}
+      <li>
+        <a class="page-scroll" href="#about">About</a>
+      </li>
+    {% endif %}
+    <li>
+      <a class="page-scroll" href="#contact">Contact</a>
+    </li>
+
+    {% if user.is_authenticated %}
+      <li>
+        <a class="page-scroll" href="{% url 'logout' %}"><i class="fa fa-lg fa-sign-out"></i></a>
+      </li>
+    {% endif %}
   </ul>
 </div>

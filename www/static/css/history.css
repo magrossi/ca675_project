@@ -1,0 +1,49 @@
+.row-eq-height {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.progress {
+    margin: 5px 0 0 0;
+}
+
+.progress-bar-info {
+    background-color: silver;
+    color: rgb(0, 0, 0);
+}
+
+.history-item img {
+    max-height: 150px;
+}
+
+.panel-heading .created:before {
+    font-family: 'Glyphicons Halflings';
+    content: "\e080";
+    float: left;
+    color: grey;
+    padding-right: 10px;
+}
+
+.panel-heading.collapsed .created:before {
+    content: "\e114";
+}
+
+.pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
+    background-color: #f05f40;
+    border-color: #f05f40;
+}
+
+.pagination > li > a, .pagination > li > span {
+    color: #f05f40;
+}
+
+.pagination > li > a:focus, .pagination > li > a:hover, .pagination > li > span:focus, .pagination > li > span:hover {
+    color: #f05f40;
+}
+
+#about {
+    padding: 80px 0 30px 0;
+}
