@@ -1,12 +1,6 @@
 import os
-import urllib
-from cStringIO import StringIO
-
-from PIL import Image
 from django.test import TestCase
-from django.test.client import RequestFactory
 from django.core.files.uploadedfile import SimpleUploadedFile
-
 import face_matcher.tests
 from face_matcher.forms import ImageUploadForm
 
@@ -15,6 +9,7 @@ IMG_FIXTURE_PATH = os.path.join(os.path.dirname(face_matcher.tests.__file__),
 
 
 class FormsTestCase(TestCase):
+
     def _build_form(self, **kwargs):
         image = open(IMG_FIXTURE_PATH)
         upload = SimpleUploadedFile(image.name, image.read(), content_type='image/png')
