@@ -144,7 +144,7 @@ class ImageLibrary():
     @classmethod
     def save_image(cls, raw_img, rel_img_path):
         if settings.IMAGE_STORAGE_MODE == cls._LOCAL_STORAGE:
-            filename = cls.get_image_url(rel_img_path)
+            filename = os.path.join(settings.IMAGE_STORAGE_LOCAL_DIR, rel_img_path)
             full_dir = os.path.dirname(filename)
             if not os.path.exists(full_dir):
                 os.makedirs(full_dir)
