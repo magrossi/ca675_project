@@ -70,6 +70,9 @@ class History(models.Model):
     output = models.TextField(null=True)
     finished_at = models.DateTimeField(null=True)
 
+    def __unicode__(self):
+        return "{}: {}".format(self.created_at, self.status)
+
     class Meta:
         ordering = ('-created_at',)
 
@@ -78,6 +81,9 @@ class HistoryItem(models.Model):
     history = models.ForeignKey('History', on_delete=models.CASCADE)
     face = models.ForeignKey('Face', on_delete=models.CASCADE)
     similarity_score = models.FloatField(null=False)
+
+    def __unicode__(self):
+        return str(self.similarity_score)
 
     class Meta:
         ordering = ('-similarity_score',)

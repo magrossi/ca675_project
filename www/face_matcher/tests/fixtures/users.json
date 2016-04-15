@@ -1,0 +1,46 @@
+[
+   {
+      "fields":{
+         "username":"billGatesSux",
+         "first_name":"Bill",
+         "last_name":"Gates",
+         "is_active":true,
+         "is_superuser":false,
+         "is_staff":false,
+         "last_login":"2016-04-14T15:33:22.159Z",
+         "groups":[
+
+         ],
+         "user_permissions":[
+
+         ],
+         "password":"pbkdf2_sha256$12000$UfETMRgWVkgW$UjNgZ4rcgtHNr4JcWrofBtApmP5J5RsMchtAdk/RzeA=",
+         "email":"linuxwillnever@last.lol",
+         "date_joined":"2016-04-14T15:33:22.159Z"
+      },
+      "model":"auth.user",
+      "pk":1
+   },
+   {
+      "fields":{
+         "username":"normy",
+         "first_name":"Pepe",
+         "last_name":"Frog",
+         "is_active":true,
+         "is_superuser":false,
+         "is_staff":false,
+         "last_login":"2016-04-14T15:34:06.695Z",
+         "groups":[
+
+         ],
+         "user_permissions":[
+
+         ],
+         "password":"pbkdf2_sha256$12000$IuT19VQLRNbx$wfN3LqZWMXm6QbrHJTaxeKkGpdUU4OZ1Es7TdtJNWak=",
+         "email":"iknow@that.feel",
+         "date_joined":"2016-04-14T15:33:58.289Z"
+      },
+      "model":"auth.user",
+      "pk":2
+   }
+]

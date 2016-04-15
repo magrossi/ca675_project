@@ -64,6 +64,11 @@ TEMPLATE_DIRS = (
     TEMPLATE_PATH,
 )
 
+FIXTURE_PATH = os.path.join(BASE_DIR, 'face_matcher/tests/fixtures')
+FIXTURE_DIRS = (
+   FIXTURE_PATH,
+)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -83,16 +88,12 @@ USE_TZ = True
 
 # after login homepage
 LOGIN_REDIRECT_URL = '/matcher/'
-LOGIN_URL='/login/'
+LOGIN_URL = '/login/'
 
 MIN_PASSWORD_LENGTH = 3
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
-
-# STATICFILES_DIRS = (
-#     STATIC_ROOT,
-# )
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
