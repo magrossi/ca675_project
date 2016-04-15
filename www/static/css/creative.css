@@ -11,7 +11,7 @@ body {
 }
 
 body {
-    font-family: Merriweather, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
 }
 
 hr {
@@ -112,13 +112,21 @@ aside {
 
 .navbar-default .nav > li.active > a,
 .navbar-default .nav > li.active > a:focus {
-    color: #f05f40 !important;
+    color: rgba(255, 255, 255, .7);
     background-color: transparent;
 }
 
 .navbar-default .nav > li.active > a:hover,
 .navbar-default .nav > li.active > a:focus:hover {
     background-color: transparent;
+}
+
+.min-navbar-default .navbar-toggle .icon-bar {
+    background-color: #888;
+}
+
+.min-navbar-default .navbar-toggle {
+    border-color: #ddd;
 }
 
 @media (min-width: 768px) {
@@ -473,4 +481,12 @@ img::-moz-selection {
 
 body {
     webkit-tap-highlight-color: #222;
+}
+
+.email-link a {
+    color: #333;
+}
+
+.bg-primary .email-link a {
+    color: #fff;
 }

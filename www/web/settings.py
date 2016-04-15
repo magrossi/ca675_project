@@ -81,8 +81,11 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-#after login homepage
-LOGIN_REDIRECT_URL = '/'
+# after login homepage
+LOGIN_REDIRECT_URL = '/matcher/'
+LOGIN_URL='/login/'
+
+MIN_PASSWORD_LENGTH = 3
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
