@@ -54,10 +54,7 @@ def matcher(request):
             img_file = request.FILES['image']
             _, img_extension = splitext(img_file.name)
             rel_img_path = 'user/{}/{}{}'.format(user.id, uuid.uuid4().hex, img_extension)
-            try:
-                ImageLibrary.save_image(img_file.read(), rel_img_path)
-            except:
-                raise  # todo: handle save exception
+            ImageLibrary.save_image(img_file.read(), rel_img_path)
             face_bbox = form.cleaned_data['face_bbox']
             face = Face.objects.create(
                 user=user,
