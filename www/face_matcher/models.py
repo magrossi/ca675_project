@@ -70,6 +70,11 @@ class History(models.Model):
     output = models.TextField(null=True)
     finished_at = models.DateTimeField(null=True)
 
+    @property
+    def finished(self):
+        return self.status in (self.FINISHED,  self.ERROR)
+
+
     def __unicode__(self):
         return "{}: {}".format(self.created_at, self.status)
 

@@ -12,7 +12,12 @@ from models import History, Face
 @shared_task
 def find_similars(history_id, similarity_method='cosine', face_source_filter='all', max_results=10, job_options=['r', 'inline']):
     history = History.objects.get(id=history_id)
-    FindSimilars.find(history, similarity_method=similarity_method, face_source_filter=face_source_filter, max_results=max_results, job_options=job_options)
+    try:
+        FindSimilars.find(history, similarity_method=similarity_method, face_source_filter=face_source_filter, max_results=max_results, job_options=job_options)
+    except Exception as e:
+        history.status = History.ERROR
+        history.output = str(e)
+        history.save()
     return history.id
 
 @shared_task

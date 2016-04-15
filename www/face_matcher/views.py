@@ -114,12 +114,12 @@ def get_json_histroy(request, id):
         'status_label_class': status_label_class(history.status),
     }
 
-    if history.status not in 'FE':
+    if not history.finished():
         return JsonResponse(result_dict)
 
     top_matcher = history.historyitem_set.all()[0]
     top_matcher_face = top_matcher.face
-    top_matcher_name = (top_matcher_face.face_source == 'A' and top_matcher_face.actor.name
+    top_matcher_name = (top_matcher_face.face_source == Face.ACTOR_SOURCE and top_matcher_face.actor.name
                                                             or top_matcher_face.user.username)
 
     result_dict['generated'] = calc_time(history)
