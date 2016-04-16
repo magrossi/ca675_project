@@ -1,5 +1,4 @@
 www:
-  restart: always
   command: /usr/local/bin/gunicorn web.wsgi:application -w 2 -b :8000 --reload
   build: ./www
   expose:
@@ -10,11 +9,9 @@ www:
   env_file: .env
 
 redis:
-  restart: always
   image: redis
 
 celery:
-  restart: always
   command: /usr/local/bin/celery -A web worker -l debug
   build: ./www
   volumes_from:
@@ -25,7 +22,6 @@ celery:
   env_file: .env
 
 nginx:
-  restart: always
   build: ./nginx/
   ports:
     - "80:80"
@@ -38,16 +34,8 @@ nginx:
     - www:www
 
 postgres:
-  restart: always
-  image: postgres:9.5
-  volumes_from:
-    - data
-  ports:
-    - "5432:5432"
-
-data:
-  restart: always
   image: postgres:9.5
   volumes:
     - /var/lib/postgresql
-  command: "true"
+  ports:
+    - "5432:5432"

@@ -88,3 +88,5 @@ db.sqlite3
 .idea/
 .env_prod
 migrate_and_seed.sh
+www/dataset.dat
+www/model.dat

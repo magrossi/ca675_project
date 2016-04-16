@@ -1,0 +1,20 @@
+[
+  {
+     "fields":{
+        "face":1,
+        "history":1,
+        "similarity_score":1
+     },
+     "model":"face_matcher.historyitem",
+     "pk":1
+  },
+  {
+     "fields":{
+       "face":2,
+       "history":2,
+       "similarity_score":1.1
+     },
+     "model":"face_matcher.historyitem",
+     "pk":2
+  }
+]
