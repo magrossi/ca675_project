@@ -36,16 +36,6 @@ class ModelBuilderTestCase(TestCase):
         os.chdir(self.dir.path)
         # by changing the current directory we change
         # the location where the .dat files will be created
-        # wait for Redis server to be up and running
-        rs = redis.Redis(settings.REDIS_HOST)
-        retries = 0
-        while retries < 10:
-            try:
-                rs.get(None)  # getting None returns None or throws an exception
-                break;
-            except (redis.exceptions.ConnectionError, redis.exceptions.BusyLoadingError):
-                retries += 1
-                time.sleep(6)
 
     def tearDown(self):
         # change current directory back to original
@@ -57,30 +47,6 @@ class ModelBuilderTestCase(TestCase):
         self.assertTrue(Face.objects.all().count() > 0)
         self.assertTrue(Actor.objects.all().count() > 0)
         self.assertTrue(User.objects.all().count() > 0)
-
-    def test_build_datasets_total(self):
-        # delete any files already existing
-        if os.path.isfile(ModelBuilder.model_filename):
-            os.remove(ModelBuilder.model_filename)
-        if os.path.isfile(ModelBuilder.dataset_filename):
-            os.remove(ModelBuilder.dataset_filename)
-
-        # force using the total in-memory method
-        build_datasets(method_threshold=1000000)
-        self.assertTrue(os.path.isfile(ModelBuilder.model_filename))
-        self.assertTrue(os.path.isfile(ModelBuilder.dataset_filename))
-
-    def test_build_datasets_partial(self):
-        # delete any files already existing
-        if os.path.isfile(ModelBuilder.model_filename):
-            os.remove(ModelBuilder.model_filename)
-        if os.path.isfile(ModelBuilder.dataset_filename):
-            os.remove(ModelBuilder.dataset_filename)
-
-        # force using the partial in-memory method (incremental)
-        build_datasets(method_threshold=1)
-        self.assertTrue(os.path.isfile(ModelBuilder.model_filename))
-        self.assertTrue(os.path.isfile(ModelBuilder.dataset_filename))
 
     def find_similars(self):
         # build or rebuild the datasets
