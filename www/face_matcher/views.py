@@ -130,7 +130,7 @@ def get_json_histroy(request, id):
         result_dict['history_items'].append(
             {
                 'similarity_score': multiply_100(history_item.similarity_score),
-                'image': history_item.face.face_img_path,
+                'image': history_item.face.url,
             }
         )
     return JsonResponse(result_dict)
