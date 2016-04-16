@@ -54,10 +54,7 @@ def matcher(request):
             img_file = request.FILES['image']
             _, img_extension = splitext(img_file.name)
             rel_img_path = 'user/{}/{}{}'.format(user.id, uuid.uuid4().hex, img_extension)
-            try:
-                ImageLibrary.save_image(img_file.read(), rel_img_path)
-            except:
-                raise  # todo: handle save exception
+            ImageLibrary.save_image(img_file.read(), rel_img_path)
             face_bbox = form.cleaned_data['face_bbox']
             face = Face.objects.create(
                 user=user,
@@ -114,13 +111,13 @@ def get_json_histroy(request, id):
         'status_label_class': status_label_class(history.status),
     }
 
-    if history.status not in 'FE':
+    if not history.finished():
         return JsonResponse(result_dict)
 
     top_matcher = history.historyitem_set.all()[0]
     top_matcher_face = top_matcher.face
-    top_matcher_name = top_matcher_face.face_source == 'A' and top_matcher_face.actor.name \
-                       or top_matcher_face.user.username
+    top_matcher_name = (top_matcher_face.face_source == Face.ACTOR_SOURCE and top_matcher_face.actor.name
+                                                            or top_matcher_face.user.username)
 
     result_dict['generated'] = calc_time(history)
     result_dict['status_string'] = history.get_status_display()
