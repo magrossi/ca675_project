@@ -5,6 +5,7 @@ from face_matcher.tasks import find_similars, seed, build_datasets
 from face_matcher.models import Actor, Face, History, HistoryItem
 from django.contrib.auth.models import User
 from testfixtures import TempDirectory
+from django.conf import settings
 import redis
 
 class ImageLibraryTestCase(TestCase):
