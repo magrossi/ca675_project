@@ -1,4 +1,5 @@
 server {
+    client_max_body_size 1G;
     listen 80;
     server_name example.org;
     charset utf-8;

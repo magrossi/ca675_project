@@ -38,18 +38,20 @@
                 </div>
                 <div class="info-container col-md-7 col-lg-8">
 
-                  {% if h.status in 'FE' %}
+                  {% if h.status == 'F' %}
                     <span>
-                {% with h.historyitem_set.all|first as top_matcher %}
-                  Top matcher:
-                  {% if top_matcher.face.face_source == 'A' %}
-                    Actor <b>{{ top_matcher.face.actor.name }}</b>
-                  {% else %}
-                    User <b>{{ top_matcher.face.user.username }}</b>
-                  {% endif %}
-                  {% multiply_100 top_matcher.similarity_score %}%
-                {% endwith %}
-              </span>
+                    {% with h.historyitem_set.all|first as top_matcher %}
+                      Top matcher:
+                      {% if top_matcher.face.face_source == 'A' %}
+                        Actor <b>{{ top_matcher.face.actor.name }}</b>
+                      {% else %}
+                        User <b>{{ top_matcher.face.user.username }}</b>
+                      {% endif %}
+                      {% if h.status != 'E' %}
+                        {% multiply_100 top_matcher.similarity_score %}%
+                      {% endif %}
+                    {% endwith %}
+                    </span>
                     <span class="pull-right">Generated: {% calc_time h %}</span>
                   {% endif %}
                 </div>
