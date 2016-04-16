@@ -1,10 +1,12 @@
+import csv
 from celery import shared_task
+from django.db import connection
+from django.conf import settings
+from django.contrib.auth.models import User
 from lib.findsimilars import FindSimilars
 from lib.helpers import ImageLibrary, ModelBuilder
 from models import History, Face, Actor
-from django.contrib.auth.models import User
-from django.db import connection
-import csv
+
 
 # ##################################################################### #
 # WARNING:                                                              #
@@ -63,7 +65,7 @@ def seed(max_faces=1000):
     Actor.objects.all().delete()
 
     # Facescrub Dataset used as an index
-    facescrub_dataset_file = 'facescrub_dataset.txt'
+    facescrub_dataset_file = settings.FACESCRUB_DATASET_PATH
 
     # Counters
     actor_ct = 0

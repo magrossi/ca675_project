@@ -41,10 +41,8 @@ RUN pip install --no-cache-dir virtualenv
 ### App
 ## Directories
 ENV WORKDIR /usr/src/app
-
 RUN mkdir -p $WORKDIR/static
 WORKDIR $WORKDIR
-VOLUME $WORKDIR/static
 
 ## Requirements
 COPY requirements.txt $WORKDIR
@@ -52,12 +50,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 ## Fetch large assets
 ENV FACESCRUB_DATASET_DRIVE_ID 0BwskLTzFnnxpbHoxUmhham9mUzQ
-ADD https://googledrive.com/host/$FACESCRUB_DATASET_DRIVE_ID $WORKDIR/facescrub_dataset.txt
+RUN wget --no-check-certificate https://googledrive.com/host/$FACESCRUB_DATASET_DRIVE_ID -O $WORKDIR/facescrub_dataset.txt
 ENV PREGENERATED_BMPS_DRIVE_ID 0BwskLTzFnnxpM3A4Rk9uZEtKXzQ
-ADD https://googledrive.com/host/$PREGENERATED_BMPS_DRIVE_ID $WORKDIR/bmps.zip
-RUN mkdir -p $WORKDIR/static/images \
-  && unzip $WORKDIR/bmps.zip -d $WORKDIR/static/images  \
+RUN wget --no-check-certificate https://googledrive.com/host/$PREGENERATED_BMPS_DRIVE_ID -O $WORKDIR/bmps.zip \
+  && unzip $WORKDIR/bmps.zip -d $WORKDIR/static/images \
   && rm -f $WORKDIR/bmps.zip
+
+## Volumes
+VOLUME $WORKDIR/static
 
 ## Source
 ADD . $WORKDIR

@@ -111,7 +111,7 @@ def get_json_histroy(request, id):
         'status_label_class': status_label_class(history.status),
     }
 
-    if not history.finished():
+    if not history.finished:
         return JsonResponse(result_dict)
 
     top_matcher = history.historyitem_set.all()[0]

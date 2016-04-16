@@ -109,6 +109,8 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 # App settings
+FACESCRUB_DATASET_PATH = os.path.join(BASE_DIR, 'facescrub_dataset.txt')
+
 FACEREC_IMG_SIZE = (int(os.environ['FACEREC_WIDTH']), int(os.environ['FACEREC_HEIGHT']))
 FACEREC_COMPONENTS = int(os.environ['FACEREC_COMPONENTS'])
 FACEREC_MAX_SEED_IMG = 0 if os.getenv('FACEREC_MAX_SEED_IMG') is None else int(os.getenv('FACEREC_MAX_SEED_IMG'))
