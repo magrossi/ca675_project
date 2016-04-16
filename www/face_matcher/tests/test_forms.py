@@ -1,6 +1,7 @@
 import os
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
+
 import face_matcher.tests
 from face_matcher.forms import ImageUploadForm
 

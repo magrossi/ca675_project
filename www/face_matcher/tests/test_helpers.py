@@ -1,12 +1,16 @@
-import os, os.path, time
-from django.test import TestCase
-from lib.helpers import ImageLibrary, ModelBuilder
-from face_matcher.tasks import find_similars, seed, build_datasets
-from face_matcher.models import Actor, Face, History, HistoryItem
-from django.contrib.auth.models import User
-from testfixtures import TempDirectory
-from django.conf import settings
+import os
+import os.path
+import time
+
 import redis
+from testfixtures import TempDirectory
+from django.test import TestCase
+from django.conf import settings
+from django.contrib.auth.models import User
+from lib.helpers import ImageLibrary
+from face_matcher.models import Actor, Face, History
+from face_matcher.tasks import find_similars, seed, build_datasets
+
 
 class ImageLibraryTestCase(TestCase):
     def setUp(self):
@@ -24,6 +28,7 @@ class ImageLibraryTestCase(TestCase):
     def test_write_to_and_del_from_storage(self):
         ImageLibrary.save_image("test data", self.sample_temp_file)
         ImageLibrary.del_image(self.sample_temp_file)
+
 
 class ModelBuilderTestCase(TestCase):
     def setUp(self):

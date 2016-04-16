@@ -8,5 +8,3 @@ DATASETFILE_URL = 'http://www.googledrive.com/host/0Bzt4aP7vYnOTYXpodUFmMlY4WVU/
 # Fetch pre-calculated datafiles
 urllib.urlretrieve(MODELFILE_URL, filename=expandvars("$WORKDIR/model.dat"))
 urllib.urlretrieve(DATASETFILE_URL, filename=expandvars("$WORKDIR/dataset.dat"))
-
-# TODO - assert files are present

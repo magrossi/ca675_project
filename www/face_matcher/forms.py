@@ -1,7 +1,6 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.utils.translation import ugettext, ugettext_lazy as _
 from django.conf import settings
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 
 class ImageUploadForm(forms.Form):

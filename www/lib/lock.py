@@ -1,7 +1,5 @@
-import threading
-import redis
-
 __author__ = "Mateusz Kobos"
+
 
 class RedisRWLock:
     """
@@ -57,6 +55,7 @@ class RedisRWLock:
         self.__no_writers.release()
         self.__write_switch.release(self.__no_readers)
 
+
 class _LightSwitch:
     """An auxiliary "light switch"-like object. The first thread turns on the
     "switch", the last one turns it off (see [1, sec. 4.2.2] for details)."""
@@ -81,6 +80,7 @@ class _LightSwitch:
             lock.release()
         self.__mutex.release()
 
+
 class RedisReaderLock:
     def __init__(self, redis_obj, key_prefix):
         self.__lock = RedisRWLock(redis_obj, key_prefix)
@@ -90,6 +90,7 @@ class RedisReaderLock:
 
     def __exit__(self, type, value, traceback):
         self.__lock.reader_release()
+
 
 class RedisWriterLock:
     def __init__(self, redis_obj, key_prefix):

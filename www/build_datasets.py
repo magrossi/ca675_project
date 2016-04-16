@@ -1,16 +1,21 @@
-import os, os.path, sys, csv, django, time
+import os
+import sys
+import django
+import time
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'web.settings')
 django.setup()
 
-from lib.helpers import ImageLibrary, ModelBuilder
+from lib.helpers import ModelBuilder
 from face_matcher.tasks import build_datasets
+
 
 def file_len(fname):
     with open(fname) as f:
         for i, l in enumerate(f):
             pass
     return i + 1
+
 
 def build_dataset():
     start_time = time.time()
@@ -40,12 +45,14 @@ def build_dataset():
         faces = file_len(ModelBuilder.dataset_filename)
         print 'Created model and eigenface data files in {} seconds'.format(elapsed_time)
         print 'Number of faces included in the model: {}'.format(faces)
-        print 'PCA Explained Variance Ratio: {}%'.format(100.0*sum(model.explained_variance_ratio_))
+        print 'PCA Explained Variance Ratio: {}%'.format(100.0 * sum(model.explained_variance_ratio_))
         print 'Obs.: if this number is not satisfactory try increasing the number of components'
     print ''
+
 
 def main(argv):
     build_dataset()
 
+
 if __name__ == "__main__":
-   main(sys.argv[1:])
+    main(sys.argv[1:])

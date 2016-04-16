@@ -1,12 +1,17 @@
+import os
+import os.path
+from StringIO import StringIO
+from itertools import chain, islice
+
+import redis
+import numpy as np
 from PIL import Image, ImageOps
 from sklearn.decomposition import RandomizedPCA, IncrementalPCA
 from sklearn.externals import joblib
-from django.conf import settings
 from simples3 import S3Bucket
-from StringIO import StringIO
-from itertools import chain, islice
+from django.conf import settings
 from lock import RedisReaderLock, RedisWriterLock
-import os, os.path, redis, numpy as np
+
 
 class MetaModelBuilder(type):
     @property
@@ -16,6 +21,7 @@ class MetaModelBuilder(type):
     @property
     def dataset_filename(cls):
         return cls._dataset_filename
+
 
 class ModelBuilder():
     __metaclass__ = MetaModelBuilder
@@ -110,13 +116,14 @@ class ModelBuilder():
             raise ValueError('iterator contains 0 items')
         shape0 = ans.shape[1:]
         for (i, x) in enumerate(it):
-            ans.resize((i+2,)+shape0)
-            ans[i+1] = x
+            ans.resize((i + 2,) + shape0)
+            ans[i + 1] = x
         return ans
 
     @classmethod
     def _get_redis(cls):
         return redis.Redis(settings.REDIS_HOST)
+
 
 class MetaImageLibrary(type):
     @property
@@ -126,6 +133,7 @@ class MetaImageLibrary(type):
     @property
     def components(cls):
         return settings.FACEREC_COMPONENTS
+
 
 class ImageLibrary():
     __metaclass__ = MetaImageLibrary
@@ -207,9 +215,9 @@ class ImageLibrary():
         if x1 <= curr_width and y1 <= curr_height:
             image = image.crop(bbox)
 
-        image = ImageOps.grayscale(image) # convert to greyscale
-        image = image.resize(cls.size, Image.ANTIALIAS) # resize to working size
-        image = ImageOps.equalize(image) # equalize histogram
+        image = ImageOps.grayscale(image)  # convert to greyscale
+        image = image.resize(cls.size, Image.ANTIALIAS)  # resize to working size
+        image = ImageOps.equalize(image)  # equalize histogram
 
         return np.asarray(image.getdata())
 

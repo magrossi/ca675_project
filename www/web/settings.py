@@ -12,6 +12,8 @@ import sys
 
 IS_PRODUCTION = os.environ.get('DJANGO_ENV') == 'production'
 
+
+### Django configs
 DEBUG = True
 TEMPLATE_DEBUG = not IS_PRODUCTION
 
@@ -98,17 +100,20 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# redis
+
+### Redis configs
 REDIS_HOST = 'redis'
 
-# Celery settings
+
+### Celery configs
 BROKER_URL = 'redis://' + REDIS_HOST
 CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
-# App settings
+
+### Application configs
 FACESCRUB_DATASET_PATH = os.path.join(BASE_DIR, 'facescrub_dataset.txt')
 
 FACEREC_IMG_SIZE = (int(os.environ['FACEREC_WIDTH']), int(os.environ['FACEREC_HEIGHT']))

@@ -1,6 +1,6 @@
 from django.test import TestCase
-from face_matcher.models import Actor, Face, History, HistoryItem
 from django.contrib.auth.models import User
+from face_matcher.models import Actor, Face, History, HistoryItem
 
 
 class BaseModelTestCase(TestCase):
@@ -47,6 +47,7 @@ class FaceTestCase(BaseModelTestCase):
     def test_bbox(self):
         self.assertEqual(self.first_entity.bbox, [62, 90, 231, 259])
         self.assertEqual(self.last_entity.bbox, [22, 98, 207, 283])
+
 
 class HistoryTestCase(BaseModelTestCase):
     def setUp(self):

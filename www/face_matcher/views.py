@@ -1,19 +1,23 @@
 import uuid
 from os.path import splitext
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import AuthenticationForm
-from .forms import ImageUploadForm, RegistrationForm
-from .models import History, Face
-from .tasks import find_similars
-from .templatetags.face_matcher_extras import calc_time, multiply_100, status_label_class
-from lib.helpers import ImageLibrary
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.conf import settings
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import AuthenticationForm
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from face_matcher.forms import ImageUploadForm, RegistrationForm
+from face_matcher.models import History, Face
+from face_matcher.tasks import find_similars
+from face_matcher.templatetags.face_matcher_extras import (
+    calc_time,
+    multiply_100,
+    status_label_class,
+)
+from lib.helpers import ImageLibrary
 
 
 def index(request):

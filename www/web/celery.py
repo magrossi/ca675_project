@@ -18,6 +18,7 @@ app.config_from_object('django.conf:settings')
 # load task modules from all registered Django app configs.
 app.autodiscover_tasks(['face_matcher'])
 
+
 @app.task(bind=True)
 def debug_task(self):
     print('Request: {0!r}'.format(self.request))
