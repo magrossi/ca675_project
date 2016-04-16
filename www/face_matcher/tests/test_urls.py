@@ -16,8 +16,8 @@ class UrlsTestCase(TestCase):
         self.assertEqual(resolver.view_name, 'index')
 
     def test_faces(self):
-        url, resolver = self._get_url_and_resolver('faces')
-        self.assertEqual(url, '/faces/')
+        url, resolver = self._get_url_and_resolver('matcher')
+        self.assertEqual(url, '/matcher/')
         self.assertEqual(resolver.view_name, 'faces')
 
     def test_faces(self):
