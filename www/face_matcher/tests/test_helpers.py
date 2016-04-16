@@ -5,6 +5,7 @@ from face_matcher.tasks import find_similars, seed, build_datasets
 from face_matcher.models import Actor, Face, History, HistoryItem
 from django.contrib.auth.models import User
 from testfixtures import TempDirectory
+import redis
 
 class ImageLibraryTestCase(TestCase):
     def setUp(self):
@@ -34,6 +35,16 @@ class ModelBuilderTestCase(TestCase):
         os.chdir(self.dir.path)
         # by changing the current directory we change
         # the location where the .dat files will be created
+        # wait for Redis server to be up and running
+        rs = redis.Redis(settings.REDIS_HOST)
+        retries = 0
+        while retries < 10:
+            try:
+                rs.get(None)  # getting None returns None or throws an exception
+                break;
+            except (redis.exceptions.ConnectionError, redis.exceptions.BusyLoadingError):
+                retries += 1
+                time.sleep(6)
 
     def tearDown(self):
         # change current directory back to original
