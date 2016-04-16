@@ -44,8 +44,13 @@
         if (data.top_matcher_source == 'A') {
           top_matcher_source_string = 'Actor';
         }
-        var container_html = '<span>Top matcher: ' + top_matcher_source_string;
-        container_html += ' <b>' + data.top_matcher_name + '</b> ' + data.top_matcher_similarity_score + '%';
+
+        var container_html = '<span>';
+        if (!!data.top_matcher_name && !!data.top_matcher_similarity_score) {
+          container_html += 'Top matcher: ' + top_matcher_source_string;
+          container_html += ' <b>' + data.top_matcher_name + '</b> ' + data.top_matcher_similarity_score + '%';
+        }
+
         container_html += '</span><span class="pull-right">Generated: ';
         container_html += data.generated + '</span>';
         panel.find('.info-container').html(container_html);
