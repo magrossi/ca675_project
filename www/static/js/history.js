@@ -54,7 +54,7 @@
         for (var i in data.history_items) {
           var item = data.history_items[i];
           items_html += '<div class="col-xs-6 col-md-3 history-item">' +
-              '<span class="thumbnail"><img src="/static/images/' + item.image +
+              '<span class="thumbnail"><img src="' + item.image +
               '" class="img-responsive"><div class="progress">' +
               '<div class="progress-bar progress-bar-info" role="progressbar"' +
               'aria-valuenow="' + item.similarity_score + '"aria-valuemin="0" aria-valuemax="100"' +
