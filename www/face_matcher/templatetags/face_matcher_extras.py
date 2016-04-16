@@ -18,7 +18,10 @@ def footer(block_class=''):
 
 @register.simple_tag()
 def multiply_100(number, *args, **kwargs):
-    return "{0:.2f}".format(float(number) * 100)
+    try:
+        return "{0:.2f}".format(float(number) * 100)
+    except ValueError:
+        return '0.00'
 
 
 @register.simple_tag()

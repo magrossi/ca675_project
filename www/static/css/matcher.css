@@ -6,8 +6,8 @@
 
     .tooltip-options {
         position: absolute;
-        right: -6%;
-        top: 89%;
+        right: -15%;
+        top: 75%;
     }
 
     .tooltip-options:after {

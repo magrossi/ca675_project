@@ -53,8 +53,11 @@ def matcher(request):
         if form.is_valid():
             img_file = request.FILES['image']
             _, img_extension = splitext(img_file.name)
-            rel_img_path = 'user/{}/{}{}'.format(user.id, uuid.uuid4().hex, img_extension)
-            ImageLibrary.save_image(img_file.read(), rel_img_path)
+            rel_img_path = 'user/{}/{}{}'.format(user.id, uuid.uuid1().hex, img_extension)
+            try:
+                ImageLibrary.save_image(img_file.read(), rel_img_path)
+            except:
+                raise  # todo: handle save exception
             face_bbox = form.cleaned_data['face_bbox']
             face = Face.objects.create(
                 user=user,
@@ -111,19 +114,22 @@ def get_json_histroy(request, id):
         'status_label_class': status_label_class(history.status),
     }
 
-    if not history.finished():
+    if history.status not in 'FE':
         return JsonResponse(result_dict)
 
-    top_matcher = history.historyitem_set.all()[0]
-    top_matcher_face = top_matcher.face
-    top_matcher_name = (top_matcher_face.face_source == Face.ACTOR_SOURCE and top_matcher_face.actor.name
-                                                            or top_matcher_face.user.username)
+    top_matcher = (history.historyitem_set.all() or [None,])[0]
+
+    if top_matcher:
+        top_matcher_face = top_matcher.face
+        top_matcher_name = top_matcher_face.face_source == 'A' and top_matcher_face.actor.name \
+                       or top_matcher_face.user.username
+        result_dict['top_matcher_similarity_score'] = multiply_100(top_matcher.similarity_score)
+        result_dict['top_matcher_name'] = top_matcher_name
+        result_dict['top_matcher_source'] = top_matcher_face.face_source
 
     result_dict['generated'] = calc_time(history)
     result_dict['status_string'] = history.get_status_display()
-    result_dict['top_matcher_source'] = top_matcher_face.face_source
-    result_dict['top_matcher_name'] = top_matcher_name
-    result_dict['top_matcher_similarity_score'] = multiply_100(top_matcher.similarity_score)
+   
     result_dict['history_items'] = []
 
     for history_item in history.historyitem_set.all():
