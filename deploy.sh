@@ -3,10 +3,10 @@
 # --------------------------------------------------------- #
 # Naive provisioning and deploy script for AWS.             #
 #                                                           #
-#  - Uses production-compose.yml to run the www and nginx   #
-#    services in an Ec2 instance (hosted data storage       #
-#    services are favoured over persistent production DB    #
-#    containers)                                            #
+#  - Uses production-compose.yml to run the www, celery,    #
+#    redis and nginx services in an Ec2 instance (hosted    #
+#    data storage services are favoured over persistent     #
+#    production DB containers - Postgres)                   #
 #  - Expects a local .env_prod present containing the       #
 #    following keys:                                        #
 #     - DJANGO_ENV=production                               #

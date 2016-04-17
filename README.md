@@ -1,6 +1,6 @@
 # CA675 Group Project ![Build status](https://circleci.com/gh/magrossi/ca675_project.svg?style=shield)
 
-Similar face image finder app built in Python, Django, Postgres and Nginx in a containerized microservices environment.
+Similar face image finder app built with Python, Django, Postgres and Nginx in a containerized microservice-style environment.
 
 ### Bootstrapping
 
@@ -8,25 +8,25 @@ Similar face image finder app built in Python, Django, Postgres and Nginx in a c
 1. Create a machine, `docker-machine create -d virtualbox --virtualbox-memory 4096 --virtualbox-cpu-count "2" dev`
 1. Start and point to the instance, `docker-machine start dev && eval $(docker-machine env dev)`
 1. Build the images and start the services, `docker-compose build && docker-compose up -d && docker-compose logs`
-1. Create migrations (from www), `docker-compose run www /usr/local/bin/python manage.py migrate`
-1. Add an admin user (from www), `docker-compose run www /usr/local/bin/python manage.py createsuperuser --username root --email root@root.com`
-1. Seed the database (from www), `docker-compose run www /usr/local/bin/python seed.py`
-1. Seed the initial datafiles (from www), `docker exec -it ca675project_celery_1 /usr/local/bin/python seed_datafiles.py`
+1. Run migrations, `docker-compose exec -it ca675project_www_1 /usr/local/bin/python manage.py migrate`
+1. Add an admin user, `docker-compose exec -it ca675project_www_1 /usr/local/bin/python manage.py createsuperuser --username root --email root@root.com`
+1. Seed the database, `docker-compose exec -it ca675project_www_1 /usr/local/bin/python scripts/seed.py`
+1. Seed the initial datafiles, `docker exec -it ca675project_celery_1 /usr/local/bin/python scripts/build_datasets.py`
 1. Grab the IP, `docker-machine ip dev`, and view in your browser
 
 ### Running Tests Locally
 
 1. Build the images, `docker-compose build`
-2. Run the tests, `docker-compose run www /usr/local/bin/python manage.py test`
+2. Run the tests, `docker-compose exec -it ca675project_www_1 /usr/local/bin/python manage.py test`
 
 ### Running migrations
 
-1. Upon making model DDL changes (from www), `docker-compose run www /usr/local/bin/python manage.py makemigrations face_matcher`
-1. Then run the new migration (from www), `docker-compose run www /usr/local/bin/python manage.py migrate`
+1. Upon making model DDL changes, `docker-compose exec -it ca675project_www_1 /usr/local/bin/python manage.py makemigrations face_matcher`
+1. Then run the new migration, `docker-compose exec -it ca675project_www_1 /usr/local/bin/python manage.py migrate`
 
 ### Running the REPL
 
-Simply run (from www) `docker-compose run www /usr/local/bin/python manage.py shell`
+Simply run: `docker-compose exec -it ca675project_www_1 /usr/local/bin/python manage.py shell`
 ```
 Python 2.7.11 (default, Mar 19 2016, 01:05:53)
 [GCC 4.9.2] on linux2
@@ -39,7 +39,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 ### Running the Psql shell
 
-Simply run (from www) `docker-compose run www /usr/local/bin/python manage.py dbshell`
+Simply run: `docker-compose exec -it ca675project_www_1 /usr/local/bin/python manage.py dbshell`
 ```
 psql (9.4.6, server 9.5.1)
 WARNING: psql major version 9.4, server major version 9.5.
@@ -78,7 +78,7 @@ The datasets need to be created after the first seeding of the face database is 
 The datasets can be re-built asynchronously via the web application as well as synchronously. For the synchronous version (in reality it runs asynchronously but it waits for the results and reports on execution state changes throughout) see `build_datasets.py` on the root of the `www` app. You can use the code there to run it async from the web app, but instead of waiting for the result you can simply call the task `face_matcher.tasks.build_datasets.delay()` and monitor the state in other ways.
 
 ### Searching similar faces
-The below are sample Python scripts that will use the app to search for similar faces `synchronously` and `asynchronously`. The synchronous method IS NOT suitable for running from the UI code as it will block the web service from responding until the search is completed (might take some time). For invoking searches from the UI use the asynchronous verion.
+The below are sample Python scripts that will use the app to search for similar faces `synchronously` and `asynchronously`. The synchronous method IS NOT suitable for running from the UI code as it will block the web service from responding until the search is completed (might take some time). For invoking searches from the UI use the asynchronous version.
 
 This scripts takes advantage of the `demo` user that is created in the seed.py script and will return the 10 most similar faces alongside their similarity score. The higher the score, the more similar the faces are.
 ##### Synchronously (use only for tests)
@@ -93,7 +93,7 @@ find(history, similarity_method='cosine', face_source_filter='all', max_results=
 * `max_results=` defines the number of similar faces returned
 * `job_options=` will simply forward the parameters to the `MrJob` map reduce framework. This allows us to change where the job will be run. If we want to run this in EMR for example we can pass `['r', 'emr']` as parameters. The default is `['r', 'inline']` which is ideal for running the job locally. Please refer to https://pythonhosted.org/mrjob/ for specific options available.
 
-First run the Python shell on the `www` service by executing `docker-compose run www /usr/local/bin/python manage.py shell`. In the python shell that openes execute the code below:
+First run the Python shell on the `www` service by executing `docker-compose exec -it ca675project_www_1 /usr/local/bin/python manage.py shell`. In the python shell execute the code below:
 ```
 from face_matcher.models import Face, Actor, History, HistoryItem
 from django.contrib.auth.models import User
@@ -156,7 +156,7 @@ Possible statuses are:
 One can provision the application stack to an Ec2 instance through the following steps:
 
 1. Install and configure the AWS CLI under one of your IAM users in your chosen region, https://aws.amazon.com/cli/
-1. Create a VPC for the Ec2 instnace and take note of its ID, http://docs.aws.amazon.com/cli/latest/reference/ec2/create-vpc.html
+1. Create a VPC for the Ec2 instance and take note of its ID, http://docs.aws.amazon.com/cli/latest/reference/ec2/create-vpc.html
 1. Create a subnet for the VPC and take note of the AZ it was created under, http://docs.aws.amazon.com/cli/latest/reference/ec2/create-subnet.html
 1. Along with the desired instance name, supply the VPC id and subnet's zone to the provisioning script: `NAME=fm-aws VPC_ID=someId ZONE=subnetZoneLetter REGION=someRegion sh deploy.sh -p`
 1. In your Ec2 console you will notice that the according instance has been provisioned under a new 'docker-machine' security group. This group's inbound traffic rules should be updated to allow the traffic types HTTP, PostgreSQL and SSH from all sources, http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html#adding-security-group-rule
@@ -178,5 +178,6 @@ One can provision the application stack to an Ec2 instance through the following
 ```
 
 One can deploy the application through the following steps:
+
 1. Simply run the deploy script, `NAME=aws-fm sh deploy.sh`
-1. Preview the deployed application, `open http://$(docker-machine ip aws-fm-med)`
+1. Preview the deployed application, `open http://$(docker-machine ip aws-fm)`
