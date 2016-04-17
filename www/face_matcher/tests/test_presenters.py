@@ -1,12 +1,14 @@
-from face_matcher.presenters.history import HistoryJson
 from django.test import TestCase
 from face_matcher.models import History
+from face_matcher.presenters.history import HistoryJson, HistoryIndex
 
 
 class PresentersTestCase(TestCase):
     fixtures = ['users.json', 'actors.json', 'faces.json', 'histories.json',
                 'history_items.json']
 
+
+class HistoryJsonTestCase(PresentersTestCase):
     def setUp(self):
         self.unfinished_history = History.objects.filter(status='P').first()
         self.finished_history = History.objects.filter(status='F').first()
@@ -33,3 +35,18 @@ class PresentersTestCase(TestCase):
             'top_matcher_similarity_score': '110.00',
             'top_matcher_source': 'A'
         })
+
+
+class HistoryIndexTestCase(PresentersTestCase):
+    def setUp(self):
+        self.histories = History.objects.all()
+        self.page_1_presentation = HistoryIndex(self.histories, 1).present()
+        self.page_n_presentation = HistoryIndex(self.histories, 100 * 100).present()
+
+    def test_present_paged_data(self):
+        self.assertTrue('history' in self.page_1_presentation)
+        self.assertEqual(len(self.page_1_presentation['history']), 2)
+        self.assertEqual(len(self.page_n_presentation['history']),
+                         len(self.page_1_presentation['history']))
+        self.assertEqual(self.page_n_presentation['history'][0].id, self.histories[0].id)
+        self.assertEqual(self.page_1_presentation['history'][0].id, self.histories[0].id)

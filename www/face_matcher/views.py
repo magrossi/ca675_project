@@ -8,11 +8,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from face_matcher.forms import ImageUploadForm, RegistrationForm
 from face_matcher.models import History, Face
 from face_matcher.tasks import find_similars
-from face_matcher.presenters.history import HistoryJson
+from face_matcher.presenters.history import HistoryJson, HistoryIndex
 from lib.helpers import ImageLibrary
 
 
@@ -83,22 +82,9 @@ def matcher(request):
 
 @login_required
 def history(request):
-    history_list = History.objects.filter(user=request.user)
-    paginator = Paginator(history_list, 10)  # Show 10 items per page
-
-    page = request.GET.get('page')
-
-    try:
-        history = paginator.page(page)
-    except PageNotAnInteger:
-        history = paginator.page(1)
-    except EmptyPage:
-        history = paginator.page(paginator.num_pages)
-
-    context_dict = {
-        'history': history
-    }
-    return render(request, 'face_matcher/history.html', context_dict)
+    presenter = HistoryIndex(History.objects.filter(user=request.user),
+                             request.GET.get('page'))
+    return render(request, presenter.template, presenter.present())
 
 
 @login_required
