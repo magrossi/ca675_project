@@ -2,7 +2,6 @@ import uuid
 from os.path import splitext
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
@@ -12,32 +11,24 @@ from face_matcher.forms import ImageUploadForm, RegistrationForm
 from face_matcher.models import History, Face
 from face_matcher.tasks import find_similars
 from face_matcher.presenters.history import HistoryJson, HistoryIndex
+from face_matcher.services.registration import RegistrationService
 from lib.helpers import ImageLibrary
 
 
 def index(request):
-    context_dict = {
-        'form': AuthenticationForm(),
-    }
-    return render(request, 'face_matcher/index.html', context_dict)
+    return render(request, 'face_matcher/index.html', {'form': AuthenticationForm()})
 
 
 def registration(request):
     form = None
     if request.method == 'POST':
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            user = authenticate(
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password1']
-            )
-            login(request, user)
+        registration_serivce = RegistrationService(request)
+        if registration_serivce.register():
             return redirect(settings.LOGIN_REDIRECT_URL)
+        else:
+            form = registration_serivce.form
 
-    context_dict = {
-        'form': form and form or RegistrationForm(),
-    }
+    context_dict = {'form': form and form or RegistrationForm()}
     return render(request, 'face_matcher/registration.html', context_dict)
 
 
