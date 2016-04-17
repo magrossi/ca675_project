@@ -63,17 +63,15 @@
     $('.panel.pending').each(function (index, element) {
       $.get("/ajax_history/" + element.dataset.historyId, function (data) {
         if (data.status != 'F' && data.status != 'E') return;
-
-        clearInterval(intervalId);
         _renderCompletedHistoryPanel($(element), data);
       });
     });
   };
 
-  // bind refresh and toggle actions
-  $('.refresh-page').on('click', _refreshPage);
-  $('.panel-heading').on('click', _togglePanel);
-
-  // begin poll for updating pending panels
-  var intervalId = setInterval(_updatePendingHistoryPanels, 1500);
+  // bind refresh and toggle actions, and begin poll for updating pending panels
+  $(document).ready(function() {
+    $('.refresh-page').on('click', _refreshPage);
+    $('.panel-heading').on('click', _togglePanel);
+    setInterval(_updatePendingHistoryPanels, 1500);
+  });
 })(jQuery);

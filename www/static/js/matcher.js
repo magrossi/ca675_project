@@ -67,13 +67,14 @@
     $('.output').html(data.value);
   };
 
-
   // bind refresh, on upload and data-slider actions
-  $('.refresh-page').on('click', _refreshPage);
-  $('.fileinput-new input[name=\'image\']').on('change.bs.fileinput', _onUploadAddCrop);
-  $('[data-slider]').bind('slider:ready', _onSliderReadyFadeIn);
-  $('[data-slider]').bind('slider:changed slider:ready', _onSliderChangedUpdateVal);
-  $('.settings-gear').on('click', function() {
-    $('.tooltip-options').fadeToggle();
+  $(document).ready(function() {
+    $('.refresh-page').on('click', _refreshPage);
+    $('.fileinput-new input[name=\'image\']').on('change.bs.fileinput', _onUploadAddCrop);
+    $('[data-slider]').bind('slider:ready', _onSliderReadyFadeIn);
+    $('[data-slider]').bind('slider:changed slider:ready', _onSliderChangedUpdateVal);
+    $('.settings-gear').on('click', function() {
+      $('.tooltip-options').fadeToggle();
+    });
   });
 })(jQuery); // End of use strict

@@ -12,11 +12,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from face_matcher.forms import ImageUploadForm, RegistrationForm
 from face_matcher.models import History, Face
 from face_matcher.tasks import find_similars
-from face_matcher.templatetags.face_matcher_extras import (
-    calc_time,
-    multiply_100,
-    status_label_class,
-)
+from face_matcher.presenters.history import HistoryJson
 from lib.helpers import ImageLibrary
 
 
@@ -109,32 +105,4 @@ def history(request):
 @csrf_exempt
 def get_json_histroy(request, id):
     history = History.objects.get(user=request.user, pk=id)
-
-    result_dict = {
-        'status': history.status,
-        'status_label_class': status_label_class(history.status),
-    }
-
-    if not history.finished:
-        return JsonResponse(result_dict)
-
-    top_matcher = history.historyitem_set.all()[0]
-    top_matcher_face = top_matcher.face
-    top_matcher_name = (top_matcher_face.face_source == Face.ACTOR_SOURCE and top_matcher_face.actor.name
-                                                            or top_matcher_face.user.username)
-
-    result_dict['generated'] = calc_time(history)
-    result_dict['status_string'] = history.get_status_display()
-    result_dict['top_matcher_source'] = top_matcher_face.face_source
-    result_dict['top_matcher_name'] = top_matcher_name
-    result_dict['top_matcher_similarity_score'] = multiply_100(top_matcher.similarity_score)
-    result_dict['history_items'] = []
-
-    for history_item in history.historyitem_set.all():
-        result_dict['history_items'].append(
-            {
-                'similarity_score': multiply_100(history_item.similarity_score),
-                'image': history_item.face.url,
-            }
-        )
-    return JsonResponse(result_dict)
+    return JsonResponse(HistoryJson(history).present())
