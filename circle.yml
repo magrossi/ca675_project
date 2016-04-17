@@ -16,10 +16,11 @@ dependencies:
     - perl circleci/docker_file_timestamp.pl
     - cd www && docker build -t $DOCKER_ECR_URL/$DOCKER_REPO:${CIRCLE_BRANCH/\//_} .
     - docker run -d --name db $(cat docker-compose.yml | shyaml get-value postgres.image)
+    - docker run -d --name red $(cat docker-compose.yml | shyaml get-value redis.image)
 
 test:
   override:
-    - docker run --rm --link db:postgres --env-file .env $DOCKER_ECR_URL/$DOCKER_REPO:${CIRCLE_BRANCH/\//_} python manage.py test
+    - docker run --rm --link db:postgres --link red:redis --env-file .env $DOCKER_ECR_URL/$DOCKER_REPO:${CIRCLE_BRANCH/\//_} python manage.py test
 
 deployment:
   release:
