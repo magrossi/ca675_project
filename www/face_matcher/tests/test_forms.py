@@ -1,16 +1,10 @@
-import os
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
-
-import face_matcher.tests
 from face_matcher.forms import ImageUploadForm
-
-IMG_FIXTURE_PATH = os.path.join(os.path.dirname(face_matcher.tests.__file__),
-                                'fixtures/dog.png')
+from face_matcher.tests import IMG_FIXTURE_PATH
 
 
 class FormsTestCase(TestCase):
-
     def _build_form(self, **kwargs):
         image = open(IMG_FIXTURE_PATH)
         upload = SimpleUploadedFile(image.name, image.read(), content_type='image/png')

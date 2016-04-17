@@ -1,11 +1,11 @@
 from django.contrib.auth import authenticate, login
+from face_matcher.services import BaseService
 from face_matcher.forms import RegistrationForm
 
 
-class RegistrationService(object):
+class RegistrationService(BaseService):
     def __init__(self, request):
-        self.request = request
-        self.form = RegistrationForm(self.request.POST)
+        super(RegistrationService, self).__init__(request, RegistrationForm(request.POST))
 
     def register(self):
         is_registered = False

@@ -12,6 +12,7 @@ from face_matcher.models import History, Face
 from face_matcher.tasks import find_similars
 from face_matcher.presenters.history import HistoryJson, HistoryIndex
 from face_matcher.services.registration import RegistrationService
+from face_matcher.services.matcher import FaceMatcherService
 from lib.helpers import ImageLibrary
 
 
@@ -35,39 +36,14 @@ def registration(request):
 @login_required
 def matcher(request):
     form = None
-    user = request.user
-
     if request.method == 'POST':
-        form = ImageUploadForm(request.POST, request.FILES)
-
-        if form.is_valid():
-            img_file = request.FILES['image']
-            _, img_extension = splitext(img_file.name)
-            rel_img_path = 'user/{}/{}{}'.format(user.id, uuid.uuid4().hex, img_extension)
-            ImageLibrary.save_image(img_file.read(), rel_img_path)
-            face_bbox = form.cleaned_data['face_bbox']
-            face = Face.objects.create(
-                user=user,
-                url=ImageLibrary.get_image_url(rel_img_path),
-                face_bbox=face_bbox,
-                face_img_path=rel_img_path,
-            )
-            history = History.objects.create(user=user, in_face=face)
-
-            face_source_filter = form.cleaned_data['face_source_filter']
-            max_results = form.cleaned_data['max_results']
-
-            find_similars.delay(
-                history.id,
-                face_source_filter=face_source_filter,
-                max_results=max_results,
-            )
-
+        matcher_service = FaceMatcherService(request)
+        if matcher_service.match_upload():
             return redirect('/history/')
+        else:
+            form = matcher_service.form
 
-    context_dict = {
-        'form': form and form or ImageUploadForm()
-    }
+    context_dict = {'form': form and form or ImageUploadForm()}
     return render(request, 'face_matcher/matcher.html', context_dict)
 
 
