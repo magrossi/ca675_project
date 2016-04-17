@@ -154,6 +154,7 @@ Possible statuses are:
 ### Deploying to AWS
 
 One can provision the application stack to an Ec2 instance through the following steps:
+
 1. Install and configure the AWS CLI under one of your IAM users in your chosen region, https://aws.amazon.com/cli/
 1. Create a VPC for the Ec2 instnace and take note of its ID, http://docs.aws.amazon.com/cli/latest/reference/ec2/create-vpc.html
 1. Create a subnet for the VPC and take note of the AZ it was created under, http://docs.aws.amazon.com/cli/latest/reference/ec2/create-subnet.html

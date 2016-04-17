@@ -1,6 +1,6 @@
 www:
   restart: always
-  command: /usr/local/bin/gunicorn web.wsgi:application -w 2 -b :8000 --reload
+  command: /usr/local/bin/gunicorn web.wsgi:application -w 4 -b :8000
   build: ./www
   links:
     - redis:redis
@@ -12,7 +12,7 @@ www:
 
 celery:
   restart: always
-  command: /usr/local/bin/celery -A web worker -l debug
+  command: /usr/local/bin/celery -A web worker
   build: ./www
   volumes_from:
     - www

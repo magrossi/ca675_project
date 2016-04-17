@@ -1,9 +1,9 @@
 import os
 import os.path
-
 from django.db import models
 from django.conf import settings
 from lib.helpers import ImageLibrary
+
 
 class Actor(models.Model):
     MALE = 'M'
@@ -72,8 +72,7 @@ class History(models.Model):
 
     @property
     def finished(self):
-        return self.status in (self.FINISHED,  self.ERROR)
-
+        return self.status in (self.FINISHED, self.ERROR)
 
     def __unicode__(self):
         return "{}: {}".format(self.created_at, self.status)

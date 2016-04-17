@@ -1,10 +1,16 @@
-﻿from mrjob.job import MRJob
-from mrjob.job import MRStep
+import os
+import csv
+import StringIO
+import heapq
+import tempfile
+
+import numpy as np
 from scipy import spatial
-from face_matcher.models import Face, History
+from mrjob.job import MRJob
 from django.utils import timezone
+from face_matcher.models import Face, History
 from helpers import ImageLibrary, ModelBuilder
-import os, csv, StringIO, heapq, tempfile, numpy as np
+
 
 FACE_OPTION = '--new_eigenface'
 MAX_RESULTS_OPTION = '--max_results'
@@ -12,6 +18,7 @@ FACE_SOURCE_FILTER = '--face_source_filter'
 FACE_SOURCE_FILTER_OPTS = ['all', 'actor', 'user']
 SIMILARITY_METHOD = '--similarity_method'
 SIMILARITY_METHOD_OPTS = ['cosine', 'euclidean']
+
 
 class FindSimilars():
     @classmethod
@@ -62,7 +69,8 @@ class FindSimilars():
 
                 for line in runner.stream_output():
                     face_id, similarity_score = job.parse_output_line(line)
-                    history.historyitem_set.create(face=Face.objects.get(pk=face_id), similarity_score = similarity_score)
+                    history.historyitem_set.create(face=Face.objects.get(pk=face_id),
+                                                   similarity_score=similarity_score)
 
                 history.status = history.FINISHED
         except Exception as e:
@@ -82,6 +90,7 @@ class FindSimilars():
         if (history.in_face.face_source == Face.USER_SOURCE and History.objects.exclude(id=history.id).filter(in_face_id=history.in_face.id).count() == 0):
             data_label = (history.in_face.id, history.in_face.face_source)
             ModelBuilder.append_dataset(eigenface, data_label)
+
 
 class FindSimilarsMapReduce(MRJob):
     """
@@ -109,7 +118,7 @@ class FindSimilarsMapReduce(MRJob):
 
     def similarity(self, a, b):
         if self.similarity_method == 'euclidean':
-            distance = np.linalg.norm(a-b)
+            distance = np.linalg.norm(a - b)
             return 1 / (1 + distance)
         else:
             return 1.0 - spatial.distance.cosine(a, b)

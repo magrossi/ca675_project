@@ -18,7 +18,7 @@
         <div class="col-lg-8 col-lg-offset-2 text-center">
           <h2 class="section-heading">Face Matcher</h2>
           <hr class="light">
-          <p>Upload your photo and select face:</p>
+          <p>Upload your photo and get matching...</p>
           <form enctype="multipart/form-data" method="post">
             {% csrf_token %}
             {% for error in form.image.errors %}
