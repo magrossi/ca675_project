@@ -1,8 +1,10 @@
+#!/usr/bin/env python
 import os
 import sys
 import django
 from django.conf import settings
 
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'web.settings')
 django.setup()
 

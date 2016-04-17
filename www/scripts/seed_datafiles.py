@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import urllib
 from os.path import expandvars
 

@@ -1,19 +1,15 @@
-import uuid
-from os.path import splitext
-
-from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
+
+from face_matcher.models import History
 from face_matcher.forms import ImageUploadForm, RegistrationForm
-from face_matcher.models import History, Face
-from face_matcher.tasks import find_similars
 from face_matcher.presenters.history import HistoryJson, HistoryIndex
 from face_matcher.services.registration import RegistrationService
 from face_matcher.services.matcher import FaceMatcherService
-from lib.helpers import ImageLibrary
 
 
 def index(request):
