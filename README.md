@@ -1,4 +1,4 @@
-# CA675 Group Project ![Build status](https://circleci.com/gh/magrossi/ca675_project.svg?style=shield)
+# CA675 Group Project [![Build Status](https://circleci.com/gh/magrossi/face_matcher_app.svg?style=svg)](https://circleci.com/gh/magrossi/face_matcher_app)
 
 Similar face image finder app built with Python, Django, Postgres and Nginx in a containerized microservice-style environment.
 
